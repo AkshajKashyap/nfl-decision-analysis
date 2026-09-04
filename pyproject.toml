@@ -1,0 +1,35 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "coachiq"
+version = "0.1.0"
+description = "NFL coaching decision analysis, beginning with fourth downs."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "nflreadpy>=0.1.5,<0.2",
+  "polars>=1.0,<2",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8,<9",
+  "ruff>=0.8,<1",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-m 'not integration'"
+markers = [
+  "integration: requires the live nflverse data source and is not run by default",
+]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 88
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
