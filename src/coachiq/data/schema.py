@@ -37,6 +37,7 @@ REQUIRED_RAW_COLUMNS = frozenset(
         "defteam_timeouts_remaining",
         "play_type",
         "play_type_nfl",
+        "result",
     }
 )
 
@@ -85,6 +86,8 @@ NORMALIZED_SCHEMA: dict[str, pl.DataType] = {
     "away_timeouts_remaining": pl.Int8,
     "posteam_timeouts_remaining": pl.Int8,
     "defteam_timeouts_remaining": pl.Int8,
+    # Final observed result used only as the state-value target
+    "home_score_differential_final": pl.Int16,
     # Play/action audit fields
     "play_type": pl.String,
     "nfl_play_type": pl.String,

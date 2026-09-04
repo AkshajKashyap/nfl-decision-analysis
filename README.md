@@ -5,14 +5,17 @@ coaching decisions, beginning with fourth downs. Counterfactual action values
 will always be presented as model-based estimates under explicit assumptions,
 not as known alternative outcomes.
 
-The repository is at Milestone 2: reproducible historical nflverse ingestion,
-a stable normalized play representation, and auditable reconstruction of
-observed fourth-down decisions and factual next states. No counterfactual
-decision model or fourth-down scoring is implemented.
+The repository is at Milestone 3: it now includes a deliberately transparent
+state-value model and conditional empirical go, field-goal, and punt baselines.
+Their expected-win-probability outputs are model-based estimates with explicit
+support and limited bootstrap uncertainty—not known counterfactual outcomes or
+coach grades.
 
 Read the [Milestone 0 foundation](docs/milestone-0-foundation.md) and the
 [normalized data contract](docs/data-contract.md). The implemented descriptive
 policy is documented in [fourth-down reconstruction](docs/fourth-down-policy.md).
+The assumptions and chronological evaluation of the first action-value
+baseline are documented in [baseline methodology](docs/baseline-methodology.md).
 
 ## Setup
 
@@ -50,3 +53,15 @@ Audit Milestone 2 coverage and a deterministic manual sample on 2024:
 ```
 
 The fourth-down audit script blocks 2025 and later development analysis.
+
+Run the expanding-window Milestone 3 evaluation and deterministic worked
+examples (each command loads only 2014–2024 data):
+
+```bash
+.venv/bin/python scripts/evaluate_baseline.py \
+  --json-output /tmp/coachiq-baseline-report.json
+.venv/bin/python scripts/worked_examples.py
+```
+
+Both scripts also accept `--parquet-dir` for explicit local raw snapshots named
+`play_by_play_YEAR.parquet`. They reject 2025 and later before loading data.

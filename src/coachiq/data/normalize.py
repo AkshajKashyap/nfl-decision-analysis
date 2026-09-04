@@ -46,6 +46,7 @@ _RAW_TO_NORMALIZED = {
     "away_timeouts_remaining": "away_timeouts_remaining",
     "posteam_timeouts_remaining": "posteam_timeouts_remaining",
     "defteam_timeouts_remaining": "defteam_timeouts_remaining",
+    "result": "home_score_differential_final",
     "play_type": "play_type",
     "play_type_nfl": "nfl_play_type",
     "desc": "description",

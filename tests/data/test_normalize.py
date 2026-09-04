@@ -31,6 +31,7 @@ def raw_pbp(**overrides: object) -> pl.DataFrame:
         "defteam_timeouts_remaining": [2, None],
         "play_type": ["punt", "no_play"],
         "play_type_nfl": ["PUNT", "PENALTY"],
+        "result": [3, -7],
         "punt_attempt": [1, None],
         "field_goal_attempt": [0, None],
         "penalty": [0, 1],
@@ -70,6 +71,7 @@ def test_normalize_coerces_binary_flags_to_nullable_booleans() -> None:
     assert punt_row["is_punt_attempt"] is True
     assert punt_row["is_field_goal_attempt"] is False
     assert punt_row["has_penalty"] is False
+    assert punt_row["home_score_differential_final"] == 3
 
 
 def test_normalize_rejects_missing_required_raw_column() -> None:

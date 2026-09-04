@@ -34,7 +34,7 @@ down, ydstogo, yardline_100, qtr, quarter_seconds_remaining,
 half_seconds_remaining, game_seconds_remaining, score_differential,
 home_timeouts_remaining, away_timeouts_remaining,
 posteam_timeouts_remaining, defteam_timeouts_remaining, play_type,
-play_type_nfl
+play_type_nfl, result
 ```
 
 Presence is different from non-nullness. For example, kickoff,
@@ -46,7 +46,7 @@ column as typed nulls rather than changing the output schema.
 ## Normalized schema
 
 All column names and Polars dtypes are defined in
-`coachiq.data.schema.NORMALIZED_SCHEMA`. The 91 columns are grouped below for
+`coachiq.data.schema.NORMALIZED_SCHEMA`. The 92 columns are grouped below for
 readability.
 
 | Group | Normalized columns |
@@ -54,6 +54,7 @@ readability.
 | Identity/order | `season`, `season_type`, `week`, `game_date`, `game_id`, `play_id`, `drive`, `play_sequence`, `nfl_api_id` |
 | Teams/context | `home_team`, `away_team`, `possession_team`, `defense_team`, `possession_side`, `home_opening_kickoff`, `home_coach`, `away_coach` |
 | Pre-play situation | `down`, `yards_to_go`, `goal_to_go`, `yards_to_goal`, `quarter`, `game_half`, `quarter_seconds_remaining`, `half_seconds_remaining`, `game_seconds_remaining`, `posteam_score`, `defteam_score`, `score_differential`, `home_timeouts_remaining`, `away_timeouts_remaining`, `posteam_timeouts_remaining`, `defteam_timeouts_remaining` |
+| Observed game target | `home_score_differential_final` |
 | Play/action audit | `play_type`, `nfl_play_type`, `description`, `is_special_teams_play`, `special_teams_play_type`, `is_rush`, `is_pass`, `is_qb_kneel`, `is_qb_spike`, `is_field_goal_attempt`, `is_punt_attempt`, `has_penalty`, `is_no_play`, `is_play_deleted`, `is_aborted_play`, `is_timeout`, `timeout_team`, `penalty_team`, `penalty_type`, `penalty_yards` |
 | Factual transition audit | `yards_gained`, `is_first_down`, `is_first_down_by_penalty`, `is_fourth_down_converted`, `is_fourth_down_failed`, `field_goal_result`, `kick_distance`, `return_yards`, `is_touchback`, `is_punt_blocked`, `is_fumble_lost`, `is_interception`, `is_touchdown`, `is_safety`, `is_return_touchdown`, `posteam_score_after`, `defteam_score_after`, `score_differential_after`, `end_yard_line`, `series_result`, `fixed_drive_result` |
 | Personnel/environment | `kicker_player_id`, `kicker_player_name`, `punter_player_id`, `punter_player_name`, `punt_returner_player_id`, `punt_returner_player_name`, `roof`, `surface`, `weather`, `temperature`, `wind` |
@@ -88,8 +89,8 @@ Milestone 2 decision-policy concerns.
 ## Milestone 2 consumer
 
 `coachiq.analysis.extract_fourth_down_candidates(normalized)` consumes this
-exact 91-column table and produces a separate fourth-down audit table. The
-normalized contract required no expansion: `nfl_play_type` identifies sacks,
+exact normalized table and produces a separate fourth-down audit table. The
+Milestone 2 contract required no expansion: `nfl_play_type` identifies sacks,
 and the existing rush/pass and kick-attempt fields provide all distinctions
 needed by the observed-action policy. Candidate disposition, factual outcome,
 repeat links, and reconstructed next-state columns are derived outputs rather
@@ -100,11 +101,18 @@ Next-state chronology uses `play_sequence` (`order_sequence` upstream), with
 `(game_id, play_id)`; corrected nflverse play IDs are not assumed to be a
 perfect temporal ordering.
 
+Milestone 3 adds the narrowly scoped
+`home_score_differential_final <- result` mapping. `result` is the observed
+final home-minus-away score margin repeated on nflverse play rows. It is used
+only to derive the eventual win-equivalent target (win 1, tie 0.5, loss 0) and
+is never a model feature. Requiring the field prevents model fitting from
+silently inventing final results from incomplete play sequences.
+
 ## Observed development-season behavior
 
 The 2024 nflverse asset was validated on 2026-09-03. It produced 49,492 rows,
 285 games, and 4,279 rows with raw `down == 4`; normalization preserved all
-49,492 rows and emitted 91 columns.
+49,492 rows and emitted 92 columns.
 
 Administrative/non-play rows account for legitimate nulls: 2,713 rows had null
 possession/defense team and score differential, 8,009 had null down, and 3,542
