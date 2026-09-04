@@ -85,6 +85,21 @@ This layer intentionally does not reject plays because they are penalties,
 no-plays, overtime, kneels, aborted snaps, or otherwise unusual. Those are
 Milestone 2 decision-policy concerns.
 
+## Milestone 2 consumer
+
+`coachiq.analysis.extract_fourth_down_candidates(normalized)` consumes this
+exact 91-column table and produces a separate fourth-down audit table. The
+normalized contract required no expansion: `nfl_play_type` identifies sacks,
+and the existing rush/pass and kick-attempt fields provide all distinctions
+needed by the observed-action policy. Candidate disposition, factual outcome,
+repeat links, and reconstructed next-state columns are derived outputs rather
+than ingestion fields. See [the fourth-down policy](fourth-down-policy.md).
+
+Next-state chronology uses `play_sequence` (`order_sequence` upstream), with
+`play_id` only as a fallback and tie-breaker. Stable play identity remains
+`(game_id, play_id)`; corrected nflverse play IDs are not assumed to be a
+perfect temporal ordering.
+
 ## Observed development-season behavior
 
 The 2024 nflverse asset was validated on 2026-09-03. It produced 49,492 rows,
