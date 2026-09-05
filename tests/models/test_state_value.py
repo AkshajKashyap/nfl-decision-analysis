@@ -62,6 +62,7 @@ def _normalized_result_fixture() -> pl.DataFrame:
                 "score_differential": 0,
                 "posteam_timeouts_remaining": 3,
                 "defteam_timeouts_remaining": 3,
+                "spread_line": 7.0,
                 "play_type": "run",
                 "nfl_play_type": "RUSH",
                 "home_score_differential_final": 7,
@@ -74,9 +75,11 @@ def _normalized_result_fixture() -> pl.DataFrame:
 def test_state_target_and_probability_perspective_are_team_relative() -> None:
     rows = build_state_value_rows(_normalized_result_fixture())
 
-    assert rows.select("evaluation_team", "eventual_win_equivalent").rows() == [
-        ("H", 1.0),
-        ("A", 0.0),
+    assert rows.select(
+        "evaluation_team", "team_pregame_spread", "eventual_win_equivalent"
+    ).rows() == [
+        ("H", 7.0, 1.0),
+        ("A", -7.0, 0.0),
     ]
     assert probability_for_team(0.72, "A", "A") == 0.72
     assert probability_for_team(0.72, "A", "H") == pytest.approx(0.28)
@@ -102,11 +105,13 @@ def test_state_value_fit_is_deterministic_and_probabilities_are_bounded() -> Non
 def test_target_and_external_probabilities_cannot_enter_feature_matrix() -> None:
     rows = _state_rows().with_columns(
         pl.lit(0.01).alias("nflverse_win_probability"),
+        pl.lit(0.02).alias("nflverse_vegas_win_probability"),
         pl.lit(99.0).alias("expected_points"),
     )
     altered = rows.with_columns(
         (1.0 - pl.col("eventual_win_equivalent")).alias("eventual_win_equivalent"),
         pl.lit(0.99).alias("nflverse_win_probability"),
+        pl.lit(0.98).alias("nflverse_vegas_win_probability"),
         pl.lit(-99.0).alias("expected_points"),
     )
 

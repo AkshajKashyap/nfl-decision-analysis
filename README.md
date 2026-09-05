@@ -5,17 +5,19 @@ coaching decisions, beginning with fourth downs. Counterfactual action values
 will always be presented as model-based estimates under explicit assumptions,
 not as known alternative outcomes.
 
-The repository is at Milestone 3: it now includes a deliberately transparent
-state-value model and conditional empirical go, field-goal, and punt baselines.
-Their expected-win-probability outputs are model-based estimates with explicit
-support and limited bootstrap uncertainty—not known counterfactual outcomes or
-coach grades.
+The repository is at Milestone 4: the owned state-value specification is now
+selected and frozen as `coachiq-wp-v1`. Conditional empirical go, field-goal,
+and punt baselines remain descriptive. Their expected-win-probability outputs
+are model-based estimates with explicit support and limited bootstrap
+uncertainty—not known counterfactual outcomes or coach grades.
 
 Read the [Milestone 0 foundation](docs/milestone-0-foundation.md) and the
 [normalized data contract](docs/data-contract.md). The implemented descriptive
 policy is documented in [fourth-down reconstruction](docs/fourth-down-policy.md).
 The assumptions and chronological evaluation of the first action-value
 baseline are documented in [baseline methodology](docs/baseline-methodology.md).
+The model-selection evidence, calibration diagnostics, and version lock are in
+the [win-probability model card](docs/wp-model-card.md).
 
 ## Setup
 
@@ -65,3 +67,12 @@ examples (each command loads only 2014–2024 data):
 
 Both scripts also accept `--parquet-dir` for explicit local raw snapshots named
 `play_by_play_YEAR.parquet`. They reject 2025 and later before loading data.
+
+Reproduce the complete Milestone 4 selection and one-time pre-lock validation
+report (including full calibration bands and regime metrics):
+
+```bash
+PYTHONPATH=src .venv/bin/python scripts/select_wp_model.py \
+  --bootstrap-replicates 1000 \
+  --json-output /tmp/coachiq-wp-model-selection.json
+```

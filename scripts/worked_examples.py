@@ -14,7 +14,7 @@ from coachiq.models import (
     build_state_value_rows,
     canonical_state_from_candidate,
     fit_action_baselines,
-    fit_state_value_model,
+    fit_locked_wp_model,
 )
 
 
@@ -45,7 +45,7 @@ def main() -> None:
     normalized = _load_normalized(seasons, args.parquet_dir)
     training_pbp = normalized.filter(pl.col("season") <= args.training_end)
     example_pbp = normalized.filter(pl.col("season") == args.example_season)
-    state_model = fit_state_value_model(build_state_value_rows(training_pbp))
+    state_model = fit_locked_wp_model(build_state_value_rows(training_pbp))
     action_models = fit_action_baselines(extract_fourth_down_candidates(training_pbp))
     examples = _select_examples(
         extract_fourth_down_candidates(example_pbp), action_models

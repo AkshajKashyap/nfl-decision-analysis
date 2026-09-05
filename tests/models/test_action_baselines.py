@@ -215,7 +215,20 @@ def test_halftime_and_nonlocal_successors_are_not_transition_evidence() -> None:
 
 def test_hypothetical_possession_change_flips_score_and_home_perspective() -> None:
     model = fit_action_baselines(candidate_training_rows())
-    state = CanonicalState("A", "B", True, -4, 2, 2000, 15, 4, 1, 3, 2)
+    state = CanonicalState(
+        "A",
+        "B",
+        True,
+        -4,
+        2,
+        2000,
+        15,
+        4,
+        1,
+        3,
+        2,
+        team_pregame_spread=6.0,
+    )
 
     field_goal_states = model.transition_distribution("field_goal", state).states
     punt_states = model.transition_distribution("punt", _state(yards_to_goal=85)).states
@@ -223,6 +236,7 @@ def test_hypothetical_possession_change_flips_score_and_home_perspective() -> No
     assert set(field_goal_states["score_differential"].to_list()) == {1.0, 4.0}
     assert set(field_goal_states["evaluation_team"].to_list()) == {"B"}
     assert set(field_goal_states["is_home"].to_list()) == {False}
+    assert set(field_goal_states["team_pregame_spread"].to_list()) == {-6.0}
     assert set(punt_states["evaluation_team"].to_list()) == {"B"}
 
 

@@ -22,6 +22,10 @@ from coachiq.analysis.fourth_down import (
     NextStateStatus,
     extract_fourth_down_candidates,
 )
+from coachiq.analysis.wp_model_selection import (
+    evaluate_wp_development,
+    evaluate_wp_prelock_validation,
+)
 
 __all__ = [
     "ActualAction",
@@ -36,6 +40,8 @@ __all__ = [
     "estimate_action_value",
     "estimate_all_actions",
     "evaluate_baseline",
+    "evaluate_wp_development",
+    "evaluate_wp_prelock_validation",
     "extract_fourth_down_candidates",
     "next_state_coverage",
 ]

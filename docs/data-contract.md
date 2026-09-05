@@ -71,6 +71,15 @@ The output includes upstream `expected_points`, `win_probability`, and
 Milestone 0. Their presence does not authorize their use as CoachIQ model
 features.
 
+Milestone 4 uses normalized `spread_line` as the sole pregame-strength feature.
+It is nflverse's closing point spread from the home-team perspective: positive
+means the home team was favored. State construction converts it to the current
+possession-team perspective (`spread_line` for the home team and its negative
+for the away team), then the locked model multiplies it by regulation time
+fraction. Missing lines are represented by numerical zero plus an explicit
+missing indicator. `win_probability` and `vegas_win_probability` remain
+external references and cannot enter the feature matrix.
+
 ## Validation rules
 
 - The normalized schema is exact: no missing, extra, or type-drift columns.

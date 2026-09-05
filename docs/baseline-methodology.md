@@ -6,6 +6,13 @@ Development seasons: 2014–2024
 
 Protected holdout: 2025
 
+This document preserves the audited Milestone 3 baseline and its original
+state-model results. Milestone 4 selected the state-value model documented in
+the [win-probability model card](wp-model-card.md). The baseline evaluation
+script continues to reproduce candidate A, while current worked action-value
+examples use locked `coachiq-wp-v1`; the action-transition specifications below
+are unchanged.
+
 This is CoachIQ's first end-to-end model-based estimate of fourth-down action
 value. It is deliberately simple and inspectable. It does not establish the
 true result of an unchosen action, identify a coach's mistake, or remove the

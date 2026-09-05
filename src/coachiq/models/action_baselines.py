@@ -166,6 +166,10 @@ class ActionBaselineSet:
                 ).clip(0.0, 3.0)
             )
             .alias("opponent_timeouts_remaining"),
+            pl.when(retained)
+            .then(pl.lit(state.team_pregame_spread, dtype=pl.Float64))
+            .otherwise(-pl.lit(state.team_pregame_spread, dtype=pl.Float64))
+            .alias("team_pregame_spread"),
             "game_id",
             "factual_outcome",
         )
@@ -257,6 +261,14 @@ def canonical_state_from_candidate(row: dict[str, object]) -> CanonicalState:
         yards_to_go=float(row["yards_to_go"]),
         team_timeouts_remaining=float(row["posteam_timeouts_remaining"]),
         opponent_timeouts_remaining=float(row["defteam_timeouts_remaining"]),
+        team_pregame_spread=(
+            float(row["spread_line"])
+            if row.get("spread_line") is not None
+            and possession_team == row["home_team"]
+            else -float(row["spread_line"])
+            if row.get("spread_line") is not None
+            else None
+        ),
     )
 
 
@@ -504,6 +516,7 @@ def _empty_state_frame() -> pl.DataFrame:
             "yards_to_go": pl.Float64,
             "team_timeouts_remaining": pl.Float64,
             "opponent_timeouts_remaining": pl.Float64,
+            "team_pregame_spread": pl.Float64,
             "game_id": pl.String,
             "factual_outcome": pl.String,
         }

@@ -9,6 +9,10 @@ import numpy as np
 import polars as pl
 
 STATE_VALUE_MODEL_VERSION = "state-value-logistic-v1"
+BASELINE_FEATURE_SPEC = "baseline"
+EXPANDED_FEATURE_SPEC = "expanded"
+PREGAME_FEATURE_SPEC = "pregame"
+PREGAME_BASELINE_FEATURE_SPEC = "pregame_baseline"
 FEATURE_NAMES = (
     "score_differential",
     "time_fraction",
@@ -22,6 +26,25 @@ FEATURE_NAMES = (
     "down_3",
     "down_4",
 )
+EXPANDED_FEATURE_NAMES = FEATURE_NAMES + (
+    "field_progress_squared",
+    "late_timeout_interaction",
+    "home_time_interaction",
+)
+PREGAME_FEATURE_NAMES = EXPANDED_FEATURE_NAMES + (
+    "pregame_strength_remaining",
+    "pregame_line_missing",
+)
+PREGAME_BASELINE_FEATURE_NAMES = FEATURE_NAMES + (
+    "pregame_strength_remaining",
+    "pregame_line_missing",
+)
+FEATURE_NAMES_BY_SPEC = {
+    BASELINE_FEATURE_SPEC: FEATURE_NAMES,
+    EXPANDED_FEATURE_SPEC: EXPANDED_FEATURE_NAMES,
+    PREGAME_FEATURE_SPEC: PREGAME_FEATURE_NAMES,
+    PREGAME_BASELINE_FEATURE_SPEC: PREGAME_BASELINE_FEATURE_NAMES,
+}
 
 
 @dataclass(frozen=True)
@@ -35,12 +58,13 @@ class StateValueModel:
     training_observations: int
     ridge_penalty: float
     iterations: int
+    feature_spec: str = BASELINE_FEATURE_SPEC
     version: str = STATE_VALUE_MODEL_VERSION
 
     def predict_proba(self, states: pl.DataFrame) -> np.ndarray:
         """Predict possession-team eventual win-equivalent probabilities."""
 
-        raw = state_feature_matrix(states)
+        raw = state_feature_matrix(states, feature_spec=self.feature_spec)
         means = np.asarray(self.feature_means)
         scales = np.asarray(self.feature_scales)
         standardized = (raw - means) / scales
@@ -52,7 +76,7 @@ class StateValueModel:
         """Return JSON-serializable model metadata and parameters."""
 
         payload = asdict(self)
-        payload["feature_names"] = list(FEATURE_NAMES)
+        payload["feature_names"] = list(FEATURE_NAMES_BY_SPEC[self.feature_spec])
         return payload
 
 
@@ -62,6 +86,8 @@ def fit_state_value_model(
     ridge_penalty: float = 1.0,
     max_iterations: int = 50,
     tolerance: float = 1e-8,
+    feature_spec: str = BASELINE_FEATURE_SPEC,
+    version: str = STATE_VALUE_MODEL_VERSION,
 ) -> StateValueModel:
     """Fit ridge logistic regression with soft 0.5 targets for tied games."""
 
@@ -69,11 +95,12 @@ def fit_state_value_model(
         raise ValueError("ridge_penalty cannot be negative")
     if not states.height:
         raise ValueError("state-value training data cannot be empty")
+    _validate_feature_spec(feature_spec)
     targets = states.get_column("eventual_win_equivalent").to_numpy().astype(float)
     if np.any((targets < 0) | (targets > 1) | ~np.isfinite(targets)):
         raise ValueError("eventual_win_equivalent targets must be within [0, 1]")
 
-    raw = state_feature_matrix(states)
+    raw = state_feature_matrix(states, feature_spec=feature_spec)
     means = raw.mean(axis=0)
     scales = raw.std(axis=0)
     scales[scales < 1e-12] = 1.0
@@ -104,12 +131,17 @@ def fit_state_value_model(
         training_observations=states.height,
         ridge_penalty=ridge_penalty,
         iterations=completed_iterations,
+        feature_spec=feature_spec,
+        version=version,
     )
 
 
-def state_feature_matrix(states: pl.DataFrame) -> np.ndarray:
+def state_feature_matrix(
+    states: pl.DataFrame, *, feature_spec: str = BASELINE_FEATURE_SPEC
+) -> np.ndarray:
     """Apply the fixed, interpretable Milestone 3 feature transformations."""
 
+    _validate_feature_spec(feature_spec)
     required = (
         "score_differential",
         "game_seconds_remaining",
@@ -138,21 +170,66 @@ def state_feature_matrix(states: pl.DataFrame) -> np.ndarray:
     time_fraction = np.clip(seconds, 0, 3600) / 3600.0
     late_fraction = 1.0 - time_fraction
     score_pressure = score / np.sqrt(np.maximum(seconds / 60.0, 1.0))
-    return np.column_stack(
+    field_progress = (100.0 - yards_to_goal) / 100.0
+    timeout_differential = timeouts - opponent_timeouts
+    baseline = np.column_stack(
         (
             score,
             time_fraction,
             score * late_fraction,
             score_pressure,
-            (100.0 - yards_to_goal) / 100.0,
+            field_progress,
             np.clip(yards_to_go, 0, 30) / 10.0,
-            timeouts - opponent_timeouts,
+            timeout_differential,
             home,
             (down == 2).astype(float),
             (down == 3).astype(float),
             (down == 4).astype(float),
         )
     )
+    if feature_spec == BASELINE_FEATURE_SPEC:
+        return baseline
+
+    if feature_spec == PREGAME_BASELINE_FEATURE_SPEC:
+        return _append_pregame_features(states, baseline, time_fraction)
+
+    expanded = np.column_stack(
+        (
+            baseline,
+            field_progress**2,
+            timeout_differential * late_fraction,
+            home * time_fraction,
+        )
+    )
+    if feature_spec == EXPANDED_FEATURE_SPEC:
+        return expanded
+
+    return _append_pregame_features(states, expanded, time_fraction)
+
+
+def _append_pregame_features(
+    states: pl.DataFrame, matrix: np.ndarray, time_fraction: np.ndarray
+) -> np.ndarray:
+    if "team_pregame_spread" in states.columns:
+        pregame_spread = (
+            states["team_pregame_spread"].cast(pl.Float64).to_numpy().astype(float)
+        )
+    else:
+        pregame_spread = np.full(states.height, np.nan)
+    missing = ~np.isfinite(pregame_spread)
+    filled_spread = np.where(missing, 0.0, pregame_spread)
+    return np.column_stack(
+        (
+            matrix,
+            filled_spread * time_fraction,
+            missing.astype(float),
+        )
+    )
+
+
+def _validate_feature_spec(feature_spec: str) -> None:
+    if feature_spec not in FEATURE_NAMES_BY_SPEC:
+        raise ValueError(f"unknown state-value feature specification: {feature_spec}")
 
 
 def _sigmoid(values: np.ndarray) -> np.ndarray:
@@ -160,7 +237,15 @@ def _sigmoid(values: np.ndarray) -> np.ndarray:
 
 
 __all__ = [
+    "BASELINE_FEATURE_SPEC",
+    "EXPANDED_FEATURE_NAMES",
+    "EXPANDED_FEATURE_SPEC",
     "FEATURE_NAMES",
+    "FEATURE_NAMES_BY_SPEC",
+    "PREGAME_FEATURE_NAMES",
+    "PREGAME_BASELINE_FEATURE_NAMES",
+    "PREGAME_BASELINE_FEATURE_SPEC",
+    "PREGAME_FEATURE_SPEC",
     "STATE_VALUE_MODEL_VERSION",
     "StateValueModel",
     "fit_state_value_model",

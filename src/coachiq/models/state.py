@@ -20,6 +20,7 @@ CANONICAL_STATE_COLUMNS = (
     "yards_to_go",
     "team_timeouts_remaining",
     "opponent_timeouts_remaining",
+    "team_pregame_spread",
 )
 
 
@@ -38,6 +39,7 @@ class CanonicalState:
     yards_to_go: float
     team_timeouts_remaining: float
     opponent_timeouts_remaining: float
+    team_pregame_spread: float | None = None
 
     def to_frame(self) -> pl.DataFrame:
         """Return a one-row frame accepted by the state-value model."""
@@ -73,6 +75,13 @@ def build_state_value_rows(pbp: pl.DataFrame) -> pl.DataFrame:
         & ~pl.col("is_play_deleted").fill_null(False)
     )
     is_home = pl.col("possession_team") == pl.col("home_team")
+    team_pregame_spread = (
+        pl.when(pl.col("spread_line").is_null())
+        .then(pl.lit(None, dtype=pl.Float64))
+        .when(is_home)
+        .then(pl.col("spread_line"))
+        .otherwise(-pl.col("spread_line"))
+    )
     home_margin = pl.col("home_score_differential_final")
     target = (
         pl.when(home_margin == 0)
@@ -104,8 +113,10 @@ def build_state_value_rows(pbp: pl.DataFrame) -> pl.DataFrame:
             pl.col("defteam_timeouts_remaining")
             .cast(pl.Float64)
             .alias("opponent_timeouts_remaining"),
+            team_pregame_spread.alias("team_pregame_spread"),
             target.alias("eventual_win_equivalent"),
             pl.col("win_probability").alias("nflverse_win_probability"),
+            pl.col("vegas_win_probability").alias("nflverse_vegas_win_probability"),
         )
         .sort("season", "game_id", "play_id")
     )
