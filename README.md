@@ -5,11 +5,12 @@ coaching decisions, beginning with fourth downs. Counterfactual action values
 will always be presented as model-based estimates under explicit assumptions,
 not as known alternative outcomes.
 
-The repository is at Milestone 4: the owned state-value specification is now
-selected and frozen as `coachiq-wp-v1`. Conditional empirical go, field-goal,
-and punt baselines remain descriptive. Their expected-win-probability outputs
-are model-based estimates with explicit support and limited bootstrap
-uncertainty—not known counterfactual outcomes or coach grades.
+The repository is at Milestone 5: the owned state-value specification remains
+frozen as `coachiq-wp-v1`, and the auditable fourth-down comparison layer is
+frozen as `coachiq-decision-v1`. Conditional empirical go, field-goal, and punt
+baselines remain descriptive. Their expected-win-probability comparisons are
+model-based estimates with explicit support and limited bootstrap uncertainty,
+not known alternative outcomes or coach grades.
 
 Read the [Milestone 0 foundation](docs/milestone-0-foundation.md) and the
 [normalized data contract](docs/data-contract.md). The implemented descriptive
@@ -18,6 +19,9 @@ The assumptions and chronological evaluation of the first action-value
 baseline are documented in [baseline methodology](docs/baseline-methodology.md).
 The model-selection evidence, calibration diagnostics, and version lock are in
 the [win-probability model card](docs/wp-model-card.md).
+The canonical action comparison, paired bootstrap, support policy,
+classification thresholds, and limitations are in the
+[decision-value methodology](docs/decision-value-methodology.md).
 
 ## Setup
 
@@ -75,4 +79,17 @@ report (including full calibration bands and regime metrics):
 PYTHONPATH=src .venv/bin/python scripts/select_wp_model.py \
   --bootstrap-replicates 1000 \
   --json-output /tmp/coachiq-wp-model-selection.json
+```
+
+Run the complete Milestone 5 chronological report and reuse it for the worked
+and largest-gap audit views (all commands are restricted to 2014--2024):
+
+```bash
+PYTHONPATH=src .venv/bin/python scripts/audit_decision_values.py diagnostics \
+  --parquet-dir /tmp --bootstrap-replicates 200 \
+  --json-output /tmp/coachiq-decision-v1.json
+PYTHONPATH=src .venv/bin/python scripts/audit_decision_values.py worked \
+  --input-report /tmp/coachiq-decision-v1.json
+PYTHONPATH=src .venv/bin/python scripts/audit_decision_values.py largest \
+  --input-report /tmp/coachiq-decision-v1.json
 ```
