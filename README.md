@@ -5,12 +5,12 @@ coaching decisions, beginning with fourth downs. Counterfactual action values
 will always be presented as model-based estimates under explicit assumptions,
 not as known alternative outcomes.
 
-The repository is at Milestone 5: the owned state-value specification remains
-frozen as `coachiq-wp-v1`, and the auditable fourth-down comparison layer is
-frozen as `coachiq-decision-v1`. Conditional empirical go, field-goal, and punt
-baselines remain descriptive. Their expected-win-probability comparisons are
-model-based estimates with explicit support and limited bootstrap uncertainty,
-not known alternative outcomes or coach grades.
+The repository is at Milestone 6: the frozen v1 stack completed its one-time
+2025 holdout with **PASS WITH LIMITATIONS**. Conditional empirical go,
+field-goal, and punt baselines remain descriptive. Their
+expected-win-probability comparisons are model-based estimates with explicit
+support and limited bootstrap uncertainty, not known alternative outcomes or
+coach grades.
 
 Read the [Milestone 0 foundation](docs/milestone-0-foundation.md) and the
 [normalized data contract](docs/data-contract.md). The implemented descriptive
@@ -22,6 +22,9 @@ the [win-probability model card](docs/wp-model-card.md).
 The canonical action comparison, paired bootstrap, support policy,
 classification thresholds, and limitations are in the
 [decision-value methodology](docs/decision-value-methodology.md).
+The preregistered acceptance rules and final one-time evaluation are in the
+[2025 holdout protocol](docs/2025-holdout-protocol.md) and
+[2025 holdout report](docs/2025-holdout-report.md).
 
 ## Setup
 
