@@ -5,9 +5,11 @@ coaching decisions, beginning with fourth downs. Counterfactual action values
 will always be presented as model-based estimates under explicit assumptions,
 not as known alternative outcomes.
 
-The repository is at Milestone 6: the frozen v1 stack completed its one-time
-2025 holdout with **PASS WITH LIMITATIONS**. Conditional empirical go,
-field-goal, and punt baselines remain descriptive. Their
+The repository is at Milestone 8: the frozen v1 stack completed its one-time
+2025 holdout with **PASS WITH LIMITATIONS**, the punt-transition study was
+**INCONCLUSIVE**, and the separate `coachiq-publication-v1` safety layer is
+ready for internal game audits. Conditional empirical go, field-goal, and punt
+baselines remain descriptive. Their
 expected-win-probability comparisons are model-based estimates with explicit
 support and limited bootstrap uncertainty, not known alternative outcomes or
 coach grades.
@@ -25,6 +27,10 @@ classification thresholds, and limitations are in the
 The preregistered acceptance rules and final one-time evaluation are in the
 [2025 holdout protocol](docs/2025-holdout-protocol.md) and
 [2025 holdout report](docs/2025-holdout-report.md).
+Publication eligibility and its clipping, OT, support, and uncertainty gates
+are defined in the [publication policy](docs/publication-policy-v1.md). The
+canonical record, game/weekly reports, source fingerprints, deterministic JSON,
+and runtime are documented in the [live audit pipeline](docs/live-audit-pipeline.md).
 
 ## Setup
 
@@ -95,4 +101,16 @@ PYTHONPATH=src .venv/bin/python scripts/audit_decision_values.py worked \
   --input-report /tmp/coachiq-decision-v1.json
 PYTHONPATH=src .venv/bin/python scripts/audit_decision_values.py largest \
   --input-report /tmp/coachiq-decision-v1.json
+```
+
+Run a deterministic internal weekly publication audit from explicit snapshots
+(the Milestone 8 development guard permits historical seasons only through
+2025):
+
+```bash
+PYTHONPATH=src .venv/bin/python scripts/audit_games.py \
+  --season 2025 \
+  --week 10 \
+  --parquet-dir /tmp/coachiq-m8 \
+  --json-output /tmp/coachiq-week10.json
 ```
