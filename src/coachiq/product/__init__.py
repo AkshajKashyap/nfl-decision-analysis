@@ -1,6 +1,7 @@
 """Product-facing safety and audit contracts around frozen CoachIQ research."""
 
 from coachiq.product.audit import (
+    AuditMode,
     CandidateEvaluation,
     DecisionPublicationRecord,
     FrozenModels,
@@ -12,11 +13,13 @@ from coachiq.product.audit import (
     audit_game,
     audit_week,
     evaluate_candidate,
+    fingerprint_frame,
     fit_chronological_models,
     fit_frozen_models,
     publication_record_from_evaluation,
     publication_safe_language,
     stable_json_dumps,
+    validate_audit_boundary,
     validate_policy_development_boundary,
 )
 from coachiq.product.publication import (
@@ -30,6 +33,7 @@ from coachiq.product.publication import (
 )
 
 __all__ = [
+    "AuditMode",
     "CandidateEvaluation",
     "DecisionPublicationRecord",
     "FrozenModels",
@@ -47,11 +51,13 @@ __all__ = [
     "audit_game",
     "audit_week",
     "evaluate_candidate",
+    "fingerprint_frame",
     "fit_chronological_models",
     "fit_frozen_models",
     "publication_safe_language",
     "publication_record_from_evaluation",
     "stable_json_dumps",
     "transition_clipping_diagnostics",
+    "validate_audit_boundary",
     "validate_policy_development_boundary",
 ]

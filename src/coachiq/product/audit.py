@@ -6,6 +6,7 @@ import hashlib
 import json
 from collections import Counter
 from dataclasses import asdict, dataclass
+from enum import StrEnum
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -40,6 +41,13 @@ from coachiq.product.publication import (
 )
 
 LATEST_POLICY_DEVELOPMENT_SEASON = 2025
+
+
+class AuditMode(StrEnum):
+    """Explicit data boundary for historical and prospective audit paths."""
+
+    HISTORICAL = "historical"
+    LIVE_SHADOW_2026 = "live_shadow_2026"
 
 
 @dataclass(frozen=True)
@@ -152,6 +160,19 @@ def validate_policy_development_boundary(seasons: Iterable[int]) -> tuple[int, .
     return values
 
 
+def validate_audit_boundary(
+    seasons: Iterable[int], mode: AuditMode = AuditMode.HISTORICAL
+) -> tuple[int, ...]:
+    """Allow 2026 only through the explicit prospective shadow mode."""
+
+    values = tuple(sorted(set(int(value) for value in seasons)))
+    if mode == AuditMode.HISTORICAL:
+        return validate_policy_development_boundary(values)
+    if mode == AuditMode.LIVE_SHADOW_2026 and values == (2026,):
+        return values
+    raise ValueError("live shadow mode requires exactly season 2026")
+
+
 def fit_frozen_models(
     historical_pbp: pl.DataFrame, *, project_root: Path
 ) -> FrozenModels:
@@ -210,10 +231,11 @@ def audit_game(
     publication_policy: PublicationPolicy = PUBLICATION_POLICY_V1,
     *,
     source: SourceMetadata,
+    mode: AuditMode = AuditMode.HISTORICAL,
 ) -> GameAudit:
     """Audit one completed game with no fitting or mutable global state."""
 
-    seasons = validate_policy_development_boundary(game_pbp["season"].unique())
+    seasons = validate_audit_boundary(game_pbp["season"].unique(), mode)
     if len(seasons) != 1:
         raise ValueError("audit_game requires exactly one season")
     game_ids = tuple(str(value) for value in game_pbp["game_id"].unique())
@@ -227,6 +249,7 @@ def audit_game(
             trained_models,
             publication_policy,
             source=source,
+            mode=mode,
         )
         for row in eligible.iter_rows(named=True)
     )
@@ -300,10 +323,11 @@ def audit_week(
     *,
     source: SourceMetadata,
     notable_limit: int = 10,
+    mode: AuditMode = AuditMode.HISTORICAL,
 ) -> WeeklyAudit:
     """Aggregate games by decisions, never by coach."""
 
-    seasons = validate_policy_development_boundary(week_pbp["season"].unique())
+    seasons = validate_audit_boundary(week_pbp["season"].unique(), mode)
     weeks = tuple(sorted(int(value) for value in week_pbp["week"].unique()))
     if len(seasons) != 1 or len(weeks) != 1:
         raise ValueError("audit_week requires exactly one season and week")
@@ -313,6 +337,7 @@ def audit_week(
             trained_models,
             publication_policy,
             source=source,
+            mode=mode,
         )
         for game_id in sorted(str(value) for value in week_pbp["game_id"].unique())
     )
@@ -409,24 +434,30 @@ def build_publication_record(
     publication_policy: PublicationPolicy = PUBLICATION_POLICY_V1,
     *,
     source: SourceMetadata,
+    mode: AuditMode = AuditMode.HISTORICAL,
 ) -> DecisionPublicationRecord:
     """Create the canonical publication record for one eligible candidate."""
 
-    evaluation = evaluate_candidate(row, trained_models)
+    evaluation = evaluate_candidate(row, trained_models, mode=mode)
     return publication_record_from_evaluation(
         row,
         trained_models,
         evaluation,
         publication_policy,
         source=source,
+        mode=mode,
     )
 
 
 def evaluate_candidate(
-    row: dict[str, Any], trained_models: FrozenModels
+    row: dict[str, Any],
+    trained_models: FrozenModels,
+    *,
+    mode: AuditMode = AuditMode.HISTORICAL,
 ) -> CandidateEvaluation:
     """Run frozen decision-v1 and exact pre-clip diagnostics once."""
 
+    validate_audit_boundary((int(row["season"]),), mode)
     state = canonical_state_from_candidate(row)
     audit = audit_decision_value(
         state,
@@ -453,9 +484,11 @@ def publication_record_from_evaluation(
     publication_policy: PublicationPolicy = PUBLICATION_POLICY_V1,
     *,
     source: SourceMetadata,
+    mode: AuditMode = AuditMode.HISTORICAL,
 ) -> DecisionPublicationRecord:
     """Apply a policy to an already-scored candidate without rerunning bootstrap."""
 
+    validate_audit_boundary((int(row["season"]),), mode)
     audit = evaluation.audit
     diagnostics = evaluation.diagnostics
     publication = apply_publication_policy(audit, diagnostics, publication_policy)
@@ -649,6 +682,7 @@ def _format_yards(value: float) -> str:
 
 
 __all__ = [
+    "AuditMode",
     "CandidateEvaluation",
     "LATEST_POLICY_DEVELOPMENT_SEASON",
     "DecisionPublicationRecord",
@@ -670,4 +704,5 @@ __all__ = [
     "publication_record_from_evaluation",
     "stable_json_dumps",
     "validate_policy_development_boundary",
+    "validate_audit_boundary",
 ]
