@@ -1,0 +1,18 @@
+{
+  "decision_ids": [
+    "2026_01_ARI_LAC:3127",
+    "2026_01_NE_SEA:3657",
+    "2026_01_WAS_PHI:649",
+    "2026_01_BUF_HOU:3940",
+    "2026_01_CHI_CAR:1533",
+    "2026_01_TB_CIN:460",
+    "2026_01_ATL_PIT:3430",
+    "2026_01_GB_MIN:479",
+    "2026_01_NYJ_TEN:2539",
+    "2026_01_DAL_NYG:160"
+  ],
+  "excluded_game_ids": [
+    "2026_01_DEN_KC"
+  ],
+  "selection_rule": "publication-v1-safe only; frozen action-story round robin; one case per game before deterministic evidence-ordered fill"
+}

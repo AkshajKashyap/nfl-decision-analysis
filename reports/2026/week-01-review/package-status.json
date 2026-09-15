@@ -1,0 +1,13 @@
+{
+  "approved": 0,
+  "blockers": [
+    "source_correction_check_incomplete",
+    "human_editorial_review_pending"
+  ],
+  "externally_published": false,
+  "held_or_rejected": 0,
+  "pending_review": 10,
+  "publication_package_ready": false,
+  "selected_decision_ids": [],
+  "shortlist_size": 10
+}

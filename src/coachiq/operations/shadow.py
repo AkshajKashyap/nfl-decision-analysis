@@ -482,6 +482,8 @@ def apply_editorial_review(
         set(checks) != set(EDITORIAL_CHECKS) or not all(checks.values())
     ):
         raise ValueError("approval requires a complete passing checklist")
+    if status == "approved" and (not reviewer or not reviewer.strip()):
+        raise ValueError("approval requires a named human reviewer")
     return EditorialReview(
         game_id=str(record.identity["game_id"]),
         play_id=int(record.identity["play_id"]),

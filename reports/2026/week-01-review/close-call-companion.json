@@ -1,0 +1,66 @@
+{
+  "actions": [
+    {
+      "action": "punt",
+      "action_transition_model_version": "coachiq-action-transition-v1",
+      "available": true,
+      "bootstrap_replicates": 200,
+      "bootstrap_valid_replicates": 200,
+      "confidence_level": 0.9,
+      "expected_win_probability": 0.7737320841731967,
+      "interval_lower": 0.7733974025491136,
+      "interval_upper": 0.7740407910336197,
+      "overtime_boundary_mass": 0.0,
+      "sparse": false,
+      "support_games": 2988,
+      "support_observations": 17007,
+      "support_reason": null,
+      "support_status": "supported",
+      "uncertainty_method": "paired training-game cluster bootstrap",
+      "wp_model_version": "coachiq-wp-v1"
+    },
+    {
+      "action": "go",
+      "action_transition_model_version": "coachiq-action-transition-v1",
+      "available": true,
+      "bootstrap_replicates": 200,
+      "bootstrap_valid_replicates": 200,
+      "confidence_level": 0.9,
+      "expected_win_probability": 0.7647388356828423,
+      "interval_lower": 0.7587957103569938,
+      "interval_upper": 0.7723293278180372,
+      "overtime_boundary_mass": 0.0,
+      "sparse": false,
+      "support_games": 349,
+      "support_observations": 369,
+      "support_reason": null,
+      "support_status": "supported",
+      "uncertainty_method": "paired training-game cluster bootstrap",
+      "wp_model_version": "coachiq-wp-v1"
+    }
+  ],
+  "classification": "close_call",
+  "decision_id": "2026_01_GB_MIN:2440",
+  "identity": {
+    "away_team": "GB",
+    "game_id": "2026_01_GB_MIN",
+    "home_team": "MIN",
+    "play_id": 2440,
+    "possession_team": "GB",
+    "season": 2026,
+    "week": 1
+  },
+  "modeled_gap": 0.008993248490354433,
+  "publication_status": "withhold_close_call",
+  "situation": {
+    "defteam_timeouts_remaining": 3,
+    "game_seconds_remaining": 1629,
+    "posteam_timeouts_remaining": 3,
+    "quarter": 3,
+    "quarter_seconds_remaining": 729,
+    "score_differential": 9,
+    "yards_to_go": 10.0,
+    "yards_to_goal": 62.0
+  },
+  "wording": "CoachIQ treated 2026_01_GB_MIN:2440 as a close call, not a directional claim. Punting and going for it were separated by 0.9 percentage points, and the frozen uncertainty rule did not establish a clear preference."
+}

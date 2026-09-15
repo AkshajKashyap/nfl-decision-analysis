@@ -1,0 +1,107 @@
+{
+  "affected_decision_ids": [
+    "2026_01_DEN_KC:192",
+    "2026_01_DEN_KC:787",
+    "2026_01_DEN_KC:1021",
+    "2026_01_DEN_KC:1210",
+    "2026_01_DEN_KC:1326",
+    "2026_01_DEN_KC:1521",
+    "2026_01_DEN_KC:1624",
+    "2026_01_DEN_KC:2053",
+    "2026_01_DEN_KC:2252",
+    "2026_01_DEN_KC:2511",
+    "2026_01_DEN_KC:2700",
+    "2026_01_DEN_KC:2895",
+    "2026_01_DEN_KC:3368",
+    "2026_01_DEN_KC:3625",
+    "2026_01_DEN_KC:3845"
+  ],
+  "changed_game_ids": [
+    "2026_01_DEN_KC"
+  ],
+  "checked_at_utc": "2026-09-15T17:45:16+00:00",
+  "current_audit_counts": {
+    "clear_model_preference": 62,
+    "eligible_decisions": 203,
+    "publication_safe": 43,
+    "valued_decisions": 200
+  },
+  "current_audit_regenerated": true,
+  "current_pbp_file_sha256": "79732fdd8b64b822de54dd8aa1e85918e8fa98b9f5aa069da9d72e10ddc834a4",
+  "current_retrieved_at_utc": "2026-09-15T17:29:29.810796+00:00",
+  "current_schedule_file_sha256": "7ea6f0c388fa5e0226aaf1d2d283ea49d293879a0944587f8a7eaf7a2aebb568",
+  "current_schedule_week_fingerprint": "6c672726efbb168abd72afaf94e7c220c38683709f71280a62959946bb831366",
+  "current_week_fingerprint": "9466803a539cc2950406ab110bed922b57d8da8c3c56562fa5d566e980ffb899",
+  "deterministic_rerun_passed": true,
+  "exact_diff_complete": false,
+  "excluded_game_ids": [
+    "2026_01_DEN_KC"
+  ],
+  "externally_published": false,
+  "original_audit_counts": {
+    "clear_model_preference": 62,
+    "eligible_decisions": 203,
+    "publication_safe": 43,
+    "valued_decisions": 200
+  },
+  "original_pbp_file_sha256": "ec4a0376ab2f869c826a400ddfeea1f0d7dcebb76cde85f9227fb3159f86396b",
+  "original_retrieved_at_utc": "2026-09-15T05:52:14.904008+00:00",
+  "original_schedule_file_sha256": "1a661c148d5cd2db3d7abe139af84ac2b910773edcdef46ac02a9b2a8ea577f0",
+  "original_schedule_week_fingerprint": "1bd667130b2a7bc4336013f5366dfff0bbbbd10eb10d2a39a216133e411b4e4c",
+  "original_week_fingerprint": "ec237c65577b1cb882ff3611145aa6f248651d18e2e9028d687433840925bace",
+  "per_game_change": {
+    "2026_01_DEN_KC": {
+      "current_fingerprint": "049484764edd5d74e1f32742539b945b19bc66d1ca38270ec8526e8833073377",
+      "original_fingerprint": "b40a2fad7e9f61751780cab690193d4da0192f12cdda998f383fc77e6ab13f67",
+      "publication_result_change": "not_provable_without_original_machine_artifact",
+      "regenerated_counts": {
+        "eligible": 15,
+        "publication_safe": 6,
+        "valued": 14
+      }
+    }
+  },
+  "prospective_integrity": {
+    "frozen_2014_2024_snapshot_hashes_match_milestone_9": true,
+    "frozen_normalized_training_fingerprint": "5912982bb7071c2859de6ced61e6b10376b4d14beee7f8d670da78f3c4101559",
+    "frozen_scientific_source_changed_after_prospective_run": false,
+    "milestone_9_code_commit": "ed730a68eb5833a83223aad438d195e1983784b0",
+    "milestone_9_record_commit": "8d08c8034efb0037c66730121bc1f01d2d08e37f",
+    "paths_changed_between_commits": [
+      "docs/2026-week1-shadow-audit-report.md"
+    ]
+  },
+  "ready_for_publication": false,
+  "retention_finding": "The Milestone 9 report retained fingerprints and selected summaries, but explicitly left the original raw snapshot and generated machine artifacts outside the repository. They are absent from the current environment and upstream release assets were replaced, so changed rows/cells cannot be reconstructed exactly.",
+  "schedule_diff_status": "week fingerprint changed; prior per-game schedule fingerprints and prior schedule snapshot are unavailable for an exact row diff",
+  "unchanged_game_ids": [
+    "2026_01_ARI_LAC",
+    "2026_01_ATL_PIT",
+    "2026_01_BAL_IND",
+    "2026_01_BUF_HOU",
+    "2026_01_CHI_CAR",
+    "2026_01_CLE_JAX",
+    "2026_01_DAL_NYG",
+    "2026_01_GB_MIN",
+    "2026_01_MIA_LV",
+    "2026_01_NE_SEA",
+    "2026_01_NO_DET",
+    "2026_01_NYJ_TEN",
+    "2026_01_SF_LA",
+    "2026_01_TB_CIN",
+    "2026_01_WAS_PHI"
+  ],
+  "upstream_evidence": {
+    "derived_release_updated_at_utc": "2026-09-15T14:20:02+00:00",
+    "first_post_original_successful_run_started_at_utc": "2026-09-15T10:17:55+00:00",
+    "last_pre_original_successful_run_started_at_utc": "2026-09-15T04:25:28+00:00",
+    "raw_den_kc_asset_created_at_utc": "2026-09-15T04:22:18+00:00",
+    "raw_den_kc_asset_sha256": "39fdff6ad1f818319767d73c877d2a05202795bf30bb0ba40be11992a3608306"
+  },
+  "version_identifiers": {
+    "action_transition": "coachiq-action-transition-v1",
+    "decision": "coachiq-decision-v1",
+    "publication": "coachiq-publication-v1",
+    "wp": "coachiq-wp-v1"
+  }
+}
