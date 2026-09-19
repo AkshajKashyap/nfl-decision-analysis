@@ -1,5 +1,9 @@
 """Prospective CoachIQ live-shadow operational safeguards."""
 
+from coachiq.operations.retention import (
+    SOURCE_SNAPSHOT_FORMAT,
+    retain_week_source_snapshot,
+)
 from coachiq.operations.shadow import (
     SHADOW_PROTOCOL_SHA256,
     CorrectionReport,
@@ -21,6 +25,7 @@ from coachiq.operations.shadow import (
 
 __all__ = [
     "SHADOW_PROTOCOL_SHA256",
+    "SOURCE_SNAPSHOT_FORMAT",
     "CorrectionReport",
     "EditorialReview",
     "GameReadiness",
@@ -33,6 +38,7 @@ __all__ = [
     "compare_source_manifests",
     "finalize_operational_evidence",
     "run_shadow_week",
+    "retain_week_source_snapshot",
     "tactical_context_warnings",
     "validate_live_shadow_request",
     "validate_weekly_shadow_output",

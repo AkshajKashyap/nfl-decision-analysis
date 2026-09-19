@@ -58,6 +58,13 @@ Every run writes:
 - `run-metrics.json`: measured phase and command runtimes, intentionally
   excluded from deterministic hashes.
 
+Every run also retains a week-scoped source snapshot under
+`source-snapshots/<content-addressed-id>/`. The snapshot contains the exact
+selected schedule rows, one compressed Parquet artifact per observed game,
+and a manifest recording retrieval time, game IDs, source fingerprints, row
+counts, artifact paths, and SHA-256 hashes. It stores only the audited week,
+not a full-season dataset.
+
 A fully scored week also writes `weekly-report.json` and one
 `game-GAME_ID.json` per processed game. These preserve complete decision
 records. Operational `notable_decisions` contain only publication-v1-safe
@@ -79,6 +86,15 @@ existing output, and stops. After analyst review, rerun with
 hashes, and operational summary with `.previous` in their names, records one
 correction event, and deterministically replaces the active artifacts.
 Unchanged games remain explicitly unchanged in the correction report.
+
+Source-snapshot directories are immutable. Reusing the same source identity
+verifies the retained artifact hashes instead of rewriting files; a changed
+schedule or game fingerprint creates a new content-addressed directory. This
+keeps both sides of a future correction available for exact row/cell diffs and
+frozen-stack reruns. Operators must archive the complete weekly output
+directory rather than only its summary JSON. This policy applies
+prospectively to Week 2 and later; it does not recreate the missing original
+Week 1 Denver–Kansas City rows.
 
 ## Editorial review and tactical warnings
 

@@ -16,6 +16,7 @@ from coachiq.operations import (
     build_shadow_brief,
     build_source_manifest,
     compare_source_manifests,
+    retain_week_source_snapshot,
     run_shadow_week,
     tactical_context_warnings,
     validate_live_shadow_request,
@@ -324,6 +325,89 @@ def test_output_correction_requires_acceptance_and_preserves_predecessor(
     assert summary["source_correction_events"] == 1
     assert correction["changed_game_ids"] == ["g2"]
     assert correction["unchanged_game_ids"] == ["g1"]
+
+
+def test_week_source_retention_is_immutable_and_supports_exact_diffs(
+    tmp_path,
+) -> None:
+    schedule = pl.DataFrame([_schedule(game_id="g1"), _schedule(game_id="g2")])
+    before = pl.DataFrame(
+        {
+            "season": [2026, 2026],
+            "week": [1, 1],
+            "game_id": ["g1", "g2"],
+            "play_id": [1, 1],
+            "description": ["unchanged", "before"],
+        }
+    )
+    first_manifest = build_source_manifest(
+        schedule,
+        before,
+        before,
+        season=2026,
+        week=1,
+        retrieved_at_utc="2026-09-18T00:00:00+00:00",
+        schedule_source="fixture",
+        pbp_source="fixture",
+    )
+    first_path = retain_week_source_snapshot(tmp_path, schedule, before, first_manifest)
+    first_payload = json.loads(
+        (first_path / "manifest.json").read_text(encoding="utf-8")
+    )
+    first_bytes = {
+        path.relative_to(first_path): path.read_bytes()
+        for path in first_path.rglob("*")
+        if path.is_file()
+    }
+
+    assert first_payload["format"] == "coachiq-week-source-v1"
+    assert [game["game_id"] for game in first_payload["games"]] == ["g1", "g2"]
+    assert pl.read_parquet(first_path / "games/g2.parquet").to_dicts() == [
+        {
+            "season": 2026,
+            "week": 1,
+            "game_id": "g2",
+            "play_id": 1,
+            "description": "before",
+        }
+    ]
+
+    assert retain_week_source_snapshot(tmp_path, schedule, before, first_manifest) == (
+        first_path
+    )
+    assert first_bytes == {
+        path.relative_to(first_path): path.read_bytes()
+        for path in first_path.rglob("*")
+        if path.is_file()
+    }
+
+    after = before.with_columns(
+        pl.when(pl.col("game_id") == "g2")
+        .then(pl.lit("after"))
+        .otherwise(pl.col("description"))
+        .alias("description")
+    )
+    second_manifest = build_source_manifest(
+        schedule,
+        after,
+        after,
+        season=2026,
+        week=1,
+        retrieved_at_utc="2026-09-18T01:00:00+00:00",
+        schedule_source="fixture",
+        pbp_source="fixture",
+    )
+    second_path = retain_week_source_snapshot(
+        tmp_path, schedule, after, second_manifest
+    )
+
+    assert second_path != first_path
+    assert pl.read_parquet(first_path / "games/g2.parquet")["description"].item() == (
+        "before"
+    )
+    assert pl.read_parquet(second_path / "games/g2.parquet")["description"].item() == (
+        "after"
+    )
 
 
 def test_tactical_warnings_route_to_review_without_overriding_withholding() -> None:

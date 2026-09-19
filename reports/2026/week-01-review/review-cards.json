@@ -236,6 +236,7 @@
         "yards_to_goal": 60.0
       },
       "source_correction_state": "pbp_fingerprint_unchanged_current_source_verified",
+      "source_game_fingerprint": "edbe670be5bf6cbac90d839525b0b4cb345fd319564ffbbbe46b59f391bcee36",
       "source_verification": {
         "actual_action": true,
         "factual_outcome": true,
@@ -487,6 +488,7 @@
         "yards_to_goal": 65.0
       },
       "source_correction_state": "pbp_fingerprint_unchanged_current_source_verified",
+      "source_game_fingerprint": "133ef85ca28c67000bff6ab75f7b6a698b067d8f2114b51446303a968720febe",
       "source_verification": {
         "actual_action": true,
         "factual_outcome": true,
@@ -738,257 +740,7 @@
         "yards_to_goal": 72.0
       },
       "source_correction_state": "pbp_fingerprint_unchanged_current_source_verified",
-      "source_verification": {
-        "actual_action": true,
-        "factual_outcome": true,
-        "game_id": true,
-        "play_id": true,
-        "possession": true,
-        "quarter": true,
-        "quarter_seconds_remaining": true,
-        "score_differential": true,
-        "source_description": true,
-        "yards_to_go": true,
-        "yards_to_goal": true
-      },
-      "tactical_context_warnings": []
-    },
-    {
-      "coachiq_output": {
-        "comparison": {
-          "actual_action_modeled_gap": 0.028826704825736238,
-          "claimed_comparison_action": "punt",
-          "claimed_comparison_gap": 0.028826704825736238,
-          "decision_v1_classification": "clear_model_preference",
-          "decision_v1_classification_reason": "gap_and_pairwise_evidence_meet_policy",
-          "minimum_pairwise_superiority": 1.0,
-          "minimum_preference_gap": 0.028826704825736238,
-          "model_preferred_supported_action": "go",
-          "pairwise_evidence": [
-            {
-              "action_a": "go",
-              "action_b": "punt",
-              "available": true,
-              "bootstrap_replicates": 200,
-              "bootstrap_valid_replicates": 200,
-              "confidence_level": 0.9,
-              "difference": 0.028826704825736238,
-              "interval_lower": 0.016952150610003762,
-              "interval_upper": 0.04261126336227032,
-              "probability_a_exceeds_b": 1.0,
-              "probability_b_exceeds_a": 0.0,
-              "probability_tied": 0.0,
-              "unavailable_reason": null,
-              "uncertainty_method": "paired training-game cluster bootstrap"
-            },
-            {
-              "action_a": "go",
-              "action_b": "field_goal",
-              "available": false,
-              "bootstrap_replicates": 200,
-              "bootstrap_valid_replicates": 0,
-              "confidence_level": 0.9,
-              "difference": null,
-              "interval_lower": null,
-              "interval_upper": null,
-              "probability_a_exceeds_b": null,
-              "probability_b_exceeds_a": null,
-              "probability_tied": null,
-              "unavailable_reason": "one_or_both_actions_unsupported",
-              "uncertainty_method": "paired training-game cluster bootstrap"
-            },
-            {
-              "action_a": "field_goal",
-              "action_b": "punt",
-              "available": false,
-              "bootstrap_replicates": 200,
-              "bootstrap_valid_replicates": 0,
-              "confidence_level": 0.9,
-              "difference": null,
-              "interval_lower": null,
-              "interval_upper": null,
-              "probability_a_exceeds_b": null,
-              "probability_b_exceeds_a": null,
-              "probability_tied": null,
-              "unavailable_reason": "one_or_both_actions_unsupported",
-              "uncertainty_method": "paired training-game cluster bootstrap"
-            }
-          ]
-        },
-        "modeled_actions": [
-          {
-            "action": "go",
-            "action_transition_model_version": "coachiq-action-transition-v1",
-            "available": true,
-            "bootstrap_replicates": 200,
-            "bootstrap_valid_replicates": 200,
-            "confidence_level": 0.9,
-            "expected_win_probability": 0.5182496427127653,
-            "interval_lower": 0.5062729763182661,
-            "interval_upper": 0.5320285947167376,
-            "overtime_boundary_mass": 0.0,
-            "sparse": false,
-            "support_games": 349,
-            "support_observations": 369,
-            "support_reason": null,
-            "support_status": "supported",
-            "uncertainty_method": "paired training-game cluster bootstrap",
-            "wp_model_version": "coachiq-wp-v1"
-          },
-          {
-            "action": "field_goal",
-            "action_transition_model_version": "coachiq-action-transition-v1",
-            "available": false,
-            "bootstrap_replicates": 200,
-            "bootstrap_valid_replicates": 0,
-            "confidence_level": 0.9,
-            "expected_win_probability": null,
-            "interval_lower": null,
-            "interval_upper": null,
-            "overtime_boundary_mass": 0.0,
-            "sparse": true,
-            "support_games": 0,
-            "support_observations": 0,
-            "support_reason": "field_goal_distance_above_70_yards",
-            "support_status": "unavailable",
-            "uncertainty_method": "paired training-game cluster bootstrap",
-            "wp_model_version": "coachiq-wp-v1"
-          },
-          {
-            "action": "punt",
-            "action_transition_model_version": "coachiq-action-transition-v1",
-            "available": true,
-            "bootstrap_replicates": 200,
-            "bootstrap_valid_replicates": 200,
-            "confidence_level": 0.9,
-            "expected_win_probability": 0.48942293788702906,
-            "interval_lower": 0.4888523207469074,
-            "interval_upper": 0.49001872569639476,
-            "overtime_boundary_mass": 0.0,
-            "sparse": false,
-            "support_games": 2988,
-            "support_observations": 17007,
-            "support_reason": null,
-            "support_status": "supported",
-            "uncertainty_method": "paired training-game cluster bootstrap",
-            "wp_model_version": "coachiq-wp-v1"
-          }
-        ],
-        "safety_diagnostics": {
-          "actual_action_supported": true,
-          "clock_clipping_mass_by_action": {
-            "field_goal": null,
-            "go": 0.0,
-            "punt": 0.0
-          },
-          "field_clipping_mass_by_action": {
-            "field_goal": null,
-            "go": 0.0,
-            "punt": 0.016875404245310754
-          },
-          "maximum_clock_clipping_mass": 0.0,
-          "maximum_field_clipping_mass": 0.016875404245310754,
-          "maximum_overtime_boundary_mass": 0.0,
-          "sparse_supported_action": false,
-          "unsupported_available_action": false
-        }
-      },
-      "decision_id": "2026_01_BUF_HOU:3940",
-      "editorial_review": {
-        "checklist": {
-          "actual_action_classification": false,
-          "clipping_within_policy": false,
-          "complete_non_sparse_support": false,
-          "down_and_distance": false,
-          "factual_outcome": false,
-          "fake_or_unusual_formation": false,
-          "field_position_orientation": false,
-          "neutral_model_based_wording": false,
-          "pairwise_evidence": false,
-          "possession": false,
-          "quarter_and_clock": false,
-          "score": false,
-          "source_game_state": false,
-          "tactical_context": false,
-          "zero_overtime_boundary_mass": false
-        },
-        "decision_id": "2026_01_BUF_HOU:3940",
-        "note": null,
-        "reviewed_at_utc": null,
-        "reviewer": null,
-        "reviewer_type": null,
-        "status": "pending_review"
-      },
-      "factual_play": {
-        "actual_action": "punt",
-        "factual_outcome": "punted",
-        "source_description": "(3:24) 38-K.Kroeger punts 59 yards to BUF 4, Center-40-A.Brinkman, downed by HOU-22-J.Smith."
-      },
-      "identity": {
-        "away_team": "BUF",
-        "game_id": "2026_01_BUF_HOU",
-        "home_team": "HOU",
-        "play_id": 3940,
-        "possession_team": "HOU",
-        "season": 2026,
-        "week": 1
-      },
-      "neutral_public_language": "On 4th-and-9 from their own 37, CoachIQ favored going for it. The model estimated going for it at 51.8% win probability and punting at 48.9%, a modeled advantage of 2.9 percentage points. The comparison met CoachIQ v1's frozen evidence threshold and publication-v1 safety checks.",
-      "provenance": {
-        "action_transition_model_version": "coachiq-action-transition-v1",
-        "bootstrap_replicates": 200,
-        "bootstrap_seed": 2505,
-        "decision_value_version": "coachiq-decision-v1",
-        "publication_policy_version": "coachiq-publication-v1",
-        "source": {
-          "resolved_assets": [],
-          "retrieved_at_utc": "2026-09-15T17:29:29.810796+00:00",
-          "row_count": 2756,
-          "seasons": [
-            2026
-          ],
-          "sha256": "9466803a539cc2950406ab110bed922b57d8da8c3c56562fa5d566e980ffb899",
-          "source": "/tmp/coachiq-m10-current/play_by_play_2026.parquet",
-          "weeks": [
-            1
-          ]
-        },
-        "training_seasons": [
-          2014,
-          2015,
-          2016,
-          2017,
-          2018,
-          2019,
-          2020,
-          2021,
-          2022,
-          2023,
-          2024
-        ],
-        "training_through_season": 2024,
-        "wp_model_version": "coachiq-wp-v1"
-      },
-      "publication": {
-        "internal_explanation": null,
-        "policy_version": "coachiq-publication-v1",
-        "publishable": true,
-        "status": "publishable",
-        "withholding_reasons": []
-      },
-      "situation": {
-        "defense_team_score": 30,
-        "defteam_timeouts_remaining": 3,
-        "game_seconds_remaining": 204,
-        "possession_team_score": 31,
-        "posteam_timeouts_remaining": 3,
-        "quarter": 4,
-        "quarter_seconds_remaining": 204,
-        "score_differential": 1,
-        "yards_to_go": 9.0,
-        "yards_to_goal": 63.0
-      },
-      "source_correction_state": "pbp_fingerprint_unchanged_current_source_verified",
+      "source_game_fingerprint": "ac5545e61537e82b0f65d3c4b997722b3f34fb71e6cb1120b0a5a15c3c3ffa0e",
       "source_verification": {
         "actual_action": true,
         "factual_outcome": true,
@@ -1009,11 +761,11 @@
         "comparison": {
           "actual_action_modeled_gap": 0.0,
           "claimed_comparison_action": "punt",
-          "claimed_comparison_gap": 0.01554649509702688,
+          "claimed_comparison_gap": 0.06020599833059917,
           "decision_v1_classification": "clear_model_preference",
           "decision_v1_classification_reason": "gap_and_pairwise_evidence_meet_policy",
           "minimum_pairwise_superiority": 1.0,
-          "minimum_preference_gap": 0.01554649509702688,
+          "minimum_preference_gap": 0.06020599833059917,
           "model_preferred_supported_action": "go",
           "pairwise_evidence": [
             {
@@ -1023,9 +775,9 @@
               "bootstrap_replicates": 200,
               "bootstrap_valid_replicates": 200,
               "confidence_level": 0.9,
-              "difference": 0.01554649509702688,
-              "interval_lower": 0.011642322214283473,
-              "interval_upper": 0.019639254893690495,
+              "difference": 0.06020599833059917,
+              "interval_lower": 0.055490923976513756,
+              "interval_upper": 0.06528920785851337,
               "probability_a_exceeds_b": 1.0,
               "probability_b_exceeds_a": 0.0,
               "probability_tied": 0.0,
@@ -1074,9 +826,9 @@
             "bootstrap_replicates": 200,
             "bootstrap_valid_replicates": 200,
             "confidence_level": 0.9,
-            "expected_win_probability": 0.7731627465383509,
-            "interval_lower": 0.7693393547299094,
-            "interval_upper": 0.7773494075400116,
+            "expected_win_probability": 0.24780894954420096,
+            "interval_lower": 0.24304717782845245,
+            "interval_upper": 0.2529922063693891,
             "overtime_boundary_mass": 0.0,
             "sparse": false,
             "support_games": 580,
@@ -1112,9 +864,9 @@
             "bootstrap_replicates": 200,
             "bootstrap_valid_replicates": 200,
             "confidence_level": 0.9,
-            "expected_win_probability": 0.757616251441324,
-            "interval_lower": 0.757315566411351,
-            "interval_upper": 0.7579165933841362,
+            "expected_win_probability": 0.1876029512136018,
+            "interval_lower": 0.18729643032456375,
+            "interval_upper": 0.18794054805316301,
             "overtime_boundary_mass": 0.0,
             "sparse": false,
             "support_games": 2988,
@@ -1135,16 +887,16 @@
           "field_clipping_mass_by_action": {
             "field_goal": null,
             "go": 0.0,
-            "punt": 0.001705180219909449
+            "punt": 0.016875404245310754
           },
           "maximum_clock_clipping_mass": 0.0,
-          "maximum_field_clipping_mass": 0.001705180219909449,
+          "maximum_field_clipping_mass": 0.016875404245310754,
           "maximum_overtime_boundary_mass": 0.0,
           "sparse_supported_action": false,
           "unsupported_available_action": false
         }
       },
-      "decision_id": "2026_01_CHI_CAR:1533",
+      "decision_id": "2026_01_BUF_HOU:3022",
       "editorial_review": {
         "checklist": {
           "actual_action_classification": false,
@@ -1163,7 +915,7 @@
           "tactical_context": false,
           "zero_overtime_boundary_mass": false
         },
-        "decision_id": "2026_01_CHI_CAR:1533",
+        "decision_id": "2026_01_BUF_HOU:3022",
         "note": null,
         "reviewed_at_utc": null,
         "reviewer": null,
@@ -1172,19 +924,19 @@
       },
       "factual_play": {
         "actual_action": "go",
-        "factual_outcome": "failed",
-        "source_description": "(10:35) 18-C.Williams up the middle to CHI 21 for no gain (21-N.Scott; 97-B.Brown). (Virtual Measurement)."
+        "factual_outcome": "converted",
+        "source_description": "(2:50) 57-B.Fisher reported in as eligible. 32-D.Montgomery right tackle to HOU 39 for 2 yards (47-C.Benford; 56-J.Solomon)."
       },
       "identity": {
-        "away_team": "CHI",
-        "game_id": "2026_01_CHI_CAR",
-        "home_team": "CAR",
-        "play_id": 1533,
-        "possession_team": "CHI",
+        "away_team": "BUF",
+        "game_id": "2026_01_BUF_HOU",
+        "home_team": "HOU",
+        "play_id": 3022,
+        "possession_team": "HOU",
         "season": 2026,
         "week": 1
       },
-      "neutral_public_language": "On 4th-and-1 from their own 21, CoachIQ favored going for it. The model estimated going for it at 77.3% win probability and punting at 75.8%, a modeled advantage of 1.6 percentage points. The comparison met CoachIQ v1's frozen evidence threshold and publication-v1 safety checks.",
+      "neutral_public_language": "On 4th-and-1 from their own 37, CoachIQ favored going for it. The model estimated going for it at 24.8% win probability and punting at 18.8%, a modeled advantage of 6.0 percentage points. The comparison met CoachIQ v1's frozen evidence threshold and publication-v1 safety checks.",
       "provenance": {
         "action_transition_model_version": "coachiq-action-transition-v1",
         "bootstrap_replicates": 200,
@@ -1228,18 +980,19 @@
         "withholding_reasons": []
       },
       "situation": {
-        "defense_team_score": 14,
+        "defense_team_score": 27,
         "defteam_timeouts_remaining": 3,
-        "game_seconds_remaining": 2435,
+        "game_seconds_remaining": 1070,
         "possession_team_score": 21,
         "posteam_timeouts_remaining": 3,
-        "quarter": 2,
-        "quarter_seconds_remaining": 635,
-        "score_differential": 7,
+        "quarter": 3,
+        "quarter_seconds_remaining": 170,
+        "score_differential": -6,
         "yards_to_go": 1.0,
-        "yards_to_goal": 79.0
+        "yards_to_goal": 63.0
       },
       "source_correction_state": "pbp_fingerprint_unchanged_current_source_verified",
+      "source_game_fingerprint": "794808ec9b0f4f7fc92b46636a572c9350320f92d9d331f232b3896ecf68839a",
       "source_verification": {
         "actual_action": true,
         "factual_outcome": true,
@@ -1260,11 +1013,11 @@
         "comparison": {
           "actual_action_modeled_gap": 0.0,
           "claimed_comparison_action": "go",
-          "claimed_comparison_gap": 0.03108644373906977,
+          "claimed_comparison_gap": 0.03535051954607088,
           "decision_v1_classification": "clear_model_preference",
           "decision_v1_classification_reason": "gap_and_pairwise_evidence_meet_policy",
           "minimum_pairwise_superiority": 1.0,
-          "minimum_preference_gap": 0.03108644373906977,
+          "minimum_preference_gap": 0.03535051954607088,
           "model_preferred_supported_action": "punt",
           "pairwise_evidence": [
             {
@@ -1274,9 +1027,9 @@
               "bootstrap_replicates": 200,
               "bootstrap_valid_replicates": 200,
               "confidence_level": 0.9,
-              "difference": -0.03108644373906977,
-              "interval_lower": -0.03720231773022856,
-              "interval_upper": -0.023393078988542336,
+              "difference": -0.03535051954607088,
+              "interval_lower": -0.04441702193312835,
+              "interval_upper": -0.027246845155033374,
               "probability_a_exceeds_b": 0.0,
               "probability_b_exceeds_a": 1.0,
               "probability_tied": 0.0,
@@ -1325,13 +1078,13 @@
             "bootstrap_replicates": 200,
             "bootstrap_valid_replicates": 200,
             "confidence_level": 0.9,
-            "expected_win_probability": 0.5279882651764726,
-            "interval_lower": 0.5220481673378109,
-            "interval_upper": 0.5359125285407474,
+            "expected_win_probability": 0.3340659508520749,
+            "interval_lower": 0.3249892699805299,
+            "interval_upper": 0.34214548489856805,
             "overtime_boundary_mass": 0.0,
             "sparse": false,
-            "support_games": 349,
-            "support_observations": 369,
+            "support_games": 206,
+            "support_observations": 212,
             "support_reason": null,
             "support_status": "supported",
             "uncertainty_method": "paired training-game cluster bootstrap",
@@ -1363,9 +1116,9 @@
             "bootstrap_replicates": 200,
             "bootstrap_valid_replicates": 200,
             "confidence_level": 0.9,
-            "expected_win_probability": 0.5590747089155423,
-            "interval_lower": 0.5586917240528203,
-            "interval_upper": 0.5594681004372591,
+            "expected_win_probability": 0.3694164703981458,
+            "interval_lower": 0.3690430221152534,
+            "interval_upper": 0.36980448542744204,
             "overtime_boundary_mass": 0.0,
             "sparse": false,
             "support_games": 2988,
@@ -1385,17 +1138,17 @@
           },
           "field_clipping_mass_by_action": {
             "field_goal": null,
-            "go": 0.0,
-            "punt": 0.0015287822661257128
+            "go": 0.0047169811320754715,
+            "punt": 0.016875404245310754
           },
           "maximum_clock_clipping_mass": 0.0,
-          "maximum_field_clipping_mass": 0.0015287822661257128,
+          "maximum_field_clipping_mass": 0.016875404245310754,
           "maximum_overtime_boundary_mass": 0.0,
           "sparse_supported_action": false,
           "unsupported_available_action": false
         }
       },
-      "decision_id": "2026_01_TB_CIN:460",
+      "decision_id": "2026_01_CHI_CAR:832",
       "editorial_review": {
         "checklist": {
           "actual_action_classification": false,
@@ -1414,7 +1167,7 @@
           "tactical_context": false,
           "zero_overtime_boundary_mass": false
         },
-        "decision_id": "2026_01_TB_CIN:460",
+        "decision_id": "2026_01_CHI_CAR:832",
         "note": null,
         "reviewed_at_utc": null,
         "reviewer": null,
@@ -1424,18 +1177,18 @@
       "factual_play": {
         "actual_action": "punt",
         "factual_outcome": "punted",
-        "source_description": "(7:49) 8-R.Rehkow punts 51 yards to TB 19, Center-46-W.Wagner. 15-T.Johnson pushed ob at TB 32 for 13 yards (47-S.Bozeman)."
+        "source_description": "(4:22) 6-S.Martin punts 30 yards to CHI 33, Center-44-J.Jansen, out of bounds."
       },
       "identity": {
-        "away_team": "TB",
-        "game_id": "2026_01_TB_CIN",
-        "home_team": "CIN",
-        "play_id": 460,
-        "possession_team": "CIN",
+        "away_team": "CHI",
+        "game_id": "2026_01_CHI_CAR",
+        "home_team": "CAR",
+        "play_id": 832,
+        "possession_team": "CAR",
         "season": 2026,
         "week": 1
       },
-      "neutral_public_language": "On 4th-and-6 from their own 30, CoachIQ favored punting. The model estimated punting at 55.9% win probability and going for it at 52.8%, a modeled advantage of 3.1 percentage points. The comparison met CoachIQ v1's frozen evidence threshold and publication-v1 safety checks.",
+      "neutral_public_language": "On 4th-and-13 from their own 37, CoachIQ favored punting. The model estimated punting at 36.9% win probability and going for it at 33.4%, a modeled advantage of 3.5 percentage points. The comparison met CoachIQ v1's frozen evidence threshold and publication-v1 safety checks.",
       "provenance": {
         "action_transition_model_version": "coachiq-action-transition-v1",
         "bootstrap_replicates": 200,
@@ -1479,18 +1232,19 @@
         "withholding_reasons": []
       },
       "situation": {
-        "defense_team_score": 3,
-        "defteam_timeouts_remaining": 2,
-        "game_seconds_remaining": 3169,
-        "possession_team_score": 0,
+        "defense_team_score": 7,
+        "defteam_timeouts_remaining": 3,
+        "game_seconds_remaining": 2962,
+        "possession_team_score": 7,
         "posteam_timeouts_remaining": 3,
         "quarter": 1,
-        "quarter_seconds_remaining": 469,
-        "score_differential": -3,
-        "yards_to_go": 6.0,
-        "yards_to_goal": 70.0
+        "quarter_seconds_remaining": 262,
+        "score_differential": 0,
+        "yards_to_go": 13.0,
+        "yards_to_goal": 63.0
       },
       "source_correction_state": "pbp_fingerprint_unchanged_current_source_verified",
+      "source_game_fingerprint": "a2e993b33f22352eae558e5eb7f7b7d4c7e58ec36d5ca9f762e41b271ed88f01",
       "source_verification": {
         "actual_action": true,
         "factual_outcome": true,
@@ -1742,6 +1496,7 @@
         "yards_to_goal": 61.0
       },
       "source_correction_state": "pbp_fingerprint_unchanged_current_source_verified",
+      "source_game_fingerprint": "c6ee93b969a465de1f029d4307d7cbb961ec56183f4dfe6e591f80abb248c20d",
       "source_verification": {
         "actual_action": true,
         "factual_outcome": true,
@@ -1762,11 +1517,11 @@
         "comparison": {
           "actual_action_modeled_gap": 0.0,
           "claimed_comparison_action": "go",
-          "claimed_comparison_gap": 0.029401008989590027,
+          "claimed_comparison_gap": 0.03108644373906977,
           "decision_v1_classification": "clear_model_preference",
           "decision_v1_classification_reason": "gap_and_pairwise_evidence_meet_policy",
           "minimum_pairwise_superiority": 1.0,
-          "minimum_preference_gap": 0.029401008989590027,
+          "minimum_preference_gap": 0.03108644373906977,
           "model_preferred_supported_action": "punt",
           "pairwise_evidence": [
             {
@@ -1776,9 +1531,9 @@
               "bootstrap_replicates": 200,
               "bootstrap_valid_replicates": 200,
               "confidence_level": 0.9,
-              "difference": -0.029401008989590027,
-              "interval_lower": -0.03568869955002957,
-              "interval_upper": -0.02183441811420712,
+              "difference": -0.03108644373906977,
+              "interval_lower": -0.03720231773022856,
+              "interval_upper": -0.023393078988542336,
               "probability_a_exceeds_b": 0.0,
               "probability_b_exceeds_a": 1.0,
               "probability_tied": 0.0,
@@ -1827,9 +1582,9 @@
             "bootstrap_replicates": 200,
             "bootstrap_valid_replicates": 200,
             "confidence_level": 0.9,
-            "expected_win_probability": 0.46828349562007326,
-            "interval_lower": 0.46237022506974956,
-            "interval_upper": 0.4760919587667109,
+            "expected_win_probability": 0.5279882651764726,
+            "interval_lower": 0.5220481673378109,
+            "interval_upper": 0.5359125285407474,
             "overtime_boundary_mass": 0.0,
             "sparse": false,
             "support_games": 349,
@@ -1865,9 +1620,9 @@
             "bootstrap_replicates": 200,
             "bootstrap_valid_replicates": 200,
             "confidence_level": 0.9,
-            "expected_win_probability": 0.4976845046096633,
-            "interval_lower": 0.4972992162098938,
-            "interval_upper": 0.4980928227338856,
+            "expected_win_probability": 0.5590747089155423,
+            "interval_lower": 0.5586917240528203,
+            "interval_upper": 0.5594681004372591,
             "overtime_boundary_mass": 0.0,
             "sparse": false,
             "support_games": 2988,
@@ -1887,17 +1642,17 @@
           },
           "field_clipping_mass_by_action": {
             "field_goal": null,
-            "go": 0.0027100271002710027,
-            "punt": 0.09743046980655025
+            "go": 0.0,
+            "punt": 0.0015287822661257128
           },
           "maximum_clock_clipping_mass": 0.0,
-          "maximum_field_clipping_mass": 0.09743046980655025,
+          "maximum_field_clipping_mass": 0.0015287822661257128,
           "maximum_overtime_boundary_mass": 0.0,
           "sparse_supported_action": false,
           "unsupported_available_action": false
         }
       },
-      "decision_id": "2026_01_GB_MIN:479",
+      "decision_id": "2026_01_TB_CIN:460",
       "editorial_review": {
         "checklist": {
           "actual_action_classification": false,
@@ -1916,7 +1671,7 @@
           "tactical_context": false,
           "zero_overtime_boundary_mass": false
         },
-        "decision_id": "2026_01_GB_MIN:479",
+        "decision_id": "2026_01_TB_CIN:460",
         "note": null,
         "reviewed_at_utc": null,
         "reviewer": null,
@@ -1926,18 +1681,18 @@
       "factual_play": {
         "actual_action": "punt",
         "factual_outcome": "punted",
-        "source_description": "(8:13) 19-B.Thorson punts 36 yards to GB 19, Center-42-A.DePaola, fair catch by 23-S.Moore."
+        "source_description": "(7:49) 8-R.Rehkow punts 51 yards to TB 19, Center-46-W.Wagner. 15-T.Johnson pushed ob at TB 32 for 13 yards (47-S.Bozeman)."
       },
       "identity": {
-        "away_team": "GB",
-        "game_id": "2026_01_GB_MIN",
-        "home_team": "MIN",
-        "play_id": 479,
-        "possession_team": "MIN",
+        "away_team": "TB",
+        "game_id": "2026_01_TB_CIN",
+        "home_team": "CIN",
+        "play_id": 460,
+        "possession_team": "CIN",
         "season": 2026,
         "week": 1
       },
-      "neutral_public_language": "On 4th-and-10 from their own 45, CoachIQ favored punting. The model estimated punting at 49.8% win probability and going for it at 46.8%, a modeled advantage of 2.9 percentage points. The comparison met CoachIQ v1's frozen evidence threshold and publication-v1 safety checks.",
+      "neutral_public_language": "On 4th-and-6 from their own 30, CoachIQ favored punting. The model estimated punting at 55.9% win probability and going for it at 52.8%, a modeled advantage of 3.1 percentage points. The comparison met CoachIQ v1's frozen evidence threshold and publication-v1 safety checks.",
       "provenance": {
         "action_transition_model_version": "coachiq-action-transition-v1",
         "bootstrap_replicates": 200,
@@ -1982,17 +1737,18 @@
       },
       "situation": {
         "defense_team_score": 3,
-        "defteam_timeouts_remaining": 3,
-        "game_seconds_remaining": 3193,
+        "defteam_timeouts_remaining": 2,
+        "game_seconds_remaining": 3169,
         "possession_team_score": 0,
         "posteam_timeouts_remaining": 3,
         "quarter": 1,
-        "quarter_seconds_remaining": 493,
+        "quarter_seconds_remaining": 469,
         "score_differential": -3,
-        "yards_to_go": 10.0,
-        "yards_to_goal": 55.0
+        "yards_to_go": 6.0,
+        "yards_to_goal": 70.0
       },
       "source_correction_state": "pbp_fingerprint_unchanged_current_source_verified",
+      "source_game_fingerprint": "532f36756232ab927c0d97d56a5cf182e03d91aee248765e5a1a744a890a2478",
       "source_verification": {
         "actual_action": true,
         "factual_outcome": true,
@@ -2244,6 +2000,7 @@
         "yards_to_goal": 61.0
       },
       "source_correction_state": "pbp_fingerprint_unchanged_current_source_verified",
+      "source_game_fingerprint": "fe23cb1a02f5ac7baad7ed0a25b7a23bc661a24d689a666cc8616b1081ecf392",
       "source_verification": {
         "actual_action": true,
         "factual_outcome": true,
@@ -2264,11 +2021,11 @@
         "comparison": {
           "actual_action_modeled_gap": 0.0,
           "claimed_comparison_action": "go",
-          "claimed_comparison_gap": 0.026556881760293027,
+          "claimed_comparison_gap": 0.029401008989590027,
           "decision_v1_classification": "clear_model_preference",
           "decision_v1_classification_reason": "gap_and_pairwise_evidence_meet_policy",
           "minimum_pairwise_superiority": 1.0,
-          "minimum_preference_gap": 0.026556881760293027,
+          "minimum_preference_gap": 0.029401008989590027,
           "model_preferred_supported_action": "punt",
           "pairwise_evidence": [
             {
@@ -2278,9 +2035,9 @@
               "bootstrap_replicates": 200,
               "bootstrap_valid_replicates": 200,
               "confidence_level": 0.9,
-              "difference": -0.026556881760293027,
-              "interval_lower": -0.0320057495875993,
-              "interval_upper": -0.02047378180911062,
+              "difference": -0.029401008989590027,
+              "interval_lower": -0.03568869955002957,
+              "interval_upper": -0.02183441811420712,
               "probability_a_exceeds_b": 0.0,
               "probability_b_exceeds_a": 1.0,
               "probability_tied": 0.0,
@@ -2329,13 +2086,13 @@
             "bootstrap_replicates": 200,
             "bootstrap_valid_replicates": 200,
             "confidence_level": 0.9,
-            "expected_win_probability": 0.6281287948876875,
-            "interval_lower": 0.6228793886563432,
-            "interval_upper": 0.6340935944547675,
+            "expected_win_probability": 0.46828349562007326,
+            "interval_lower": 0.46237022506974956,
+            "interval_upper": 0.4760919587667109,
             "overtime_boundary_mass": 0.0,
             "sparse": false,
-            "support_games": 321,
-            "support_observations": 341,
+            "support_games": 349,
+            "support_observations": 369,
             "support_reason": null,
             "support_status": "supported",
             "uncertainty_method": "paired training-game cluster bootstrap",
@@ -2367,9 +2124,9 @@
             "bootstrap_replicates": 200,
             "bootstrap_valid_replicates": 200,
             "confidence_level": 0.9,
-            "expected_win_probability": 0.6546856766479805,
-            "interval_lower": 0.6543367633153259,
-            "interval_upper": 0.6550399045523521,
+            "expected_win_probability": 0.4976845046096633,
+            "interval_lower": 0.4972992162098938,
+            "interval_upper": 0.4980928227338856,
             "overtime_boundary_mass": 0.0,
             "sparse": false,
             "support_games": 2988,
@@ -2389,17 +2146,17 @@
           },
           "field_clipping_mass_by_action": {
             "field_goal": null,
-            "go": 0.0,
-            "punt": 0.005174339977656259
+            "go": 0.0027100271002710027,
+            "punt": 0.09743046980655025
           },
           "maximum_clock_clipping_mass": 0.0,
-          "maximum_field_clipping_mass": 0.005174339977656259,
+          "maximum_field_clipping_mass": 0.09743046980655025,
           "maximum_overtime_boundary_mass": 0.0,
           "sparse_supported_action": false,
           "unsupported_available_action": false
         }
       },
-      "decision_id": "2026_01_DAL_NYG:160",
+      "decision_id": "2026_01_GB_MIN:479",
       "editorial_review": {
         "checklist": {
           "actual_action_classification": false,
@@ -2418,7 +2175,7 @@
           "tactical_context": false,
           "zero_overtime_boundary_mass": false
         },
-        "decision_id": "2026_01_DAL_NYG:160",
+        "decision_id": "2026_01_GB_MIN:479",
         "note": null,
         "reviewed_at_utc": null,
         "reviewer": null,
@@ -2428,18 +2185,18 @@
       "factual_play": {
         "actual_action": "punt",
         "factual_outcome": "punted",
-        "source_description": "(12:59) 5-B.Anger punts 50 yards to NYG 17, Center-44-T.Sieg, fair catch by 87-B.Berrios."
+        "source_description": "(8:13) 19-B.Thorson punts 36 yards to GB 19, Center-42-A.DePaola, fair catch by 23-S.Moore."
       },
       "identity": {
-        "away_team": "DAL",
-        "game_id": "2026_01_DAL_NYG",
-        "home_team": "NYG",
-        "play_id": 160,
-        "possession_team": "DAL",
+        "away_team": "GB",
+        "game_id": "2026_01_GB_MIN",
+        "home_team": "MIN",
+        "play_id": 479,
+        "possession_team": "MIN",
         "season": 2026,
         "week": 1
       },
-      "neutral_public_language": "On 4th-and-5 from their own 33, CoachIQ favored punting. The model estimated punting at 65.5% win probability and going for it at 62.8%, a modeled advantage of 2.7 percentage points. The comparison met CoachIQ v1's frozen evidence threshold and publication-v1 safety checks.",
+      "neutral_public_language": "On 4th-and-10 from their own 45, CoachIQ favored punting. The model estimated punting at 49.8% win probability and going for it at 46.8%, a modeled advantage of 2.9 percentage points. The comparison met CoachIQ v1's frozen evidence threshold and publication-v1 safety checks.",
       "provenance": {
         "action_transition_model_version": "coachiq-action-transition-v1",
         "bootstrap_replicates": 200,
@@ -2483,18 +2240,19 @@
         "withholding_reasons": []
       },
       "situation": {
-        "defense_team_score": 0,
+        "defense_team_score": 3,
         "defteam_timeouts_remaining": 3,
-        "game_seconds_remaining": 3479,
+        "game_seconds_remaining": 3193,
         "possession_team_score": 0,
         "posteam_timeouts_remaining": 3,
         "quarter": 1,
-        "quarter_seconds_remaining": 779,
-        "score_differential": 0,
-        "yards_to_go": 5.0,
-        "yards_to_goal": 67.0
+        "quarter_seconds_remaining": 493,
+        "score_differential": -3,
+        "yards_to_go": 10.0,
+        "yards_to_goal": 55.0
       },
       "source_correction_state": "pbp_fingerprint_unchanged_current_source_verified",
+      "source_game_fingerprint": "ffb23901568e59ed68b5eaa70fbc430fbdc9ce9511efc14a4bdc2b4b7fa9c0e6",
       "source_verification": {
         "actual_action": true,
         "factual_outcome": true,

@@ -152,6 +152,7 @@ def build_review_card(
     record: Mapping[str, Any],
     *,
     source_facts: Mapping[str, Any],
+    source_game_fingerprint: str | None = None,
     tactical_warnings: Sequence[str] = (),
     correction_state: str,
 ) -> dict[str, Any]:
@@ -202,6 +203,9 @@ def build_review_card(
         "publication": record["publication"],
         "tactical_context_warnings": list(tactical_warnings),
         "provenance": record["provenance"],
+        "source_game_fingerprint": (
+            source_game_fingerprint or str(record["provenance"]["source"]["sha256"])
+        ),
         "source_verification": auto_checks,
         "source_correction_state": correction_state,
         "neutral_public_language": record["public_language"],
@@ -255,21 +259,50 @@ def validate_human_review(
             )
         if not all(checks.values()):
             raise ValueError("approval requires every human-review check to pass")
-        validate_correction_check(correction_check)
+        validate_correction_check(
+            correction_check,
+            game_ids=(str(record["identity"]["game_id"]),),
+        )
 
 
-def validate_correction_check(correction_check: Mapping[str, Any]) -> None:
+def validate_correction_check(
+    correction_check: Mapping[str, Any], *, game_ids: Iterable[str] = ()
+) -> None:
     """Require a complete, current source correction check before approval use."""
 
     _validate_utc_timestamp(
         correction_check.get("checked_at_utc"), "correction checked_at_utc"
     )
-    if not correction_check.get("exact_diff_complete"):
-        raise ValueError("source correction exact diff is incomplete")
     if not correction_check.get("current_audit_regenerated"):
         raise ValueError("current source was not regenerated through the frozen audit")
     if not correction_check.get("deterministic_rerun_passed"):
         raise ValueError("current source deterministic rerun did not pass")
+    if correction_check.get("exact_diff_complete") and correction_check.get(
+        "ready_for_publication"
+    ):
+        return
+
+    scoped_games = set(game_ids)
+    changed = set(correction_check.get("changed_game_ids", ()))
+    quarantined = set(correction_check.get("quarantined_game_ids", ()))
+    excluded = set(correction_check.get("excluded_game_ids", ()))
+    unchanged = set(correction_check.get("unchanged_game_ids", ()))
+    fingerprints = correction_check.get("unchanged_game_fingerprints", {})
+    scoped_quarantine_is_valid = (
+        bool(scoped_games)
+        and bool(correction_check.get("unchanged_games_may_proceed_to_human_review"))
+        and bool(correction_check.get("quarantine_is_not_a_correction_waiver"))
+        and correction_check.get("quarantined_game_decisions_may_be_selected") is False
+        and changed <= quarantined
+        and changed <= excluded
+        and scoped_games <= unchanged
+        and not scoped_games & quarantined
+        and all(fingerprints.get(game_id) for game_id in scoped_games)
+    )
+    if scoped_quarantine_is_valid:
+        return
+    if not correction_check.get("exact_diff_complete"):
+        raise ValueError("source correction exact diff is incomplete")
     if not correction_check.get("ready_for_publication"):
         raise ValueError("source correction check is not ready for publication")
 
@@ -369,7 +402,8 @@ def build_publication_package(
     """Build public artifacts only from fully approved, correction-safe inputs."""
 
     _validate_utc_timestamp(generated_at_utc, "generated_at_utc")
-    validate_correction_check(correction_check)
+    card_game_ids = [str(card["identity"]["game_id"]) for card in review_cards]
+    validate_correction_check(correction_check, game_ids=card_game_ids)
     if not 8 <= len(review_cards) <= 12:
         raise ValueError("a publication package requires an 8-12 case review shortlist")
     if not 3 <= len(selected_decision_ids) <= 5:
@@ -381,6 +415,18 @@ def build_publication_package(
     card_ids = [str(card["decision_id"]) for card in review_cards]
     if len(set(card_ids)) != len(card_ids):
         raise ValueError("review-card decision IDs must be unique")
+    if not correction_check.get("exact_diff_complete"):
+        expected_game_fingerprints = correction_check.get(
+            "unchanged_game_fingerprints", {}
+        )
+        for card in review_cards:
+            game_id = str(card["identity"]["game_id"])
+            if card.get("source_game_fingerprint") != expected_game_fingerprints.get(
+                game_id
+            ):
+                raise ValueError(
+                    f"review-card game fingerprint is not verified: {game_id}"
+                )
     reviews_by_id = {str(review["decision_id"]): review for review in reviews}
     if len(reviews_by_id) != len(reviews) or set(reviews_by_id) != set(card_ids):
         raise ValueError("every shortlisted case requires exactly one final review")

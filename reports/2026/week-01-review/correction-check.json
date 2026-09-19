@@ -38,6 +38,7 @@
     "2026_01_DEN_KC"
   ],
   "externally_published": false,
+  "failure_classification": "archival_limitation_not_scientific_model_failure",
   "original_audit_counts": {
     "clear_model_preference": 62,
     "eligible_decisions": 203,
@@ -49,6 +50,7 @@
   "original_schedule_file_sha256": "1a661c148d5cd2db3d7abe139af84ac2b910773edcdef46ac02a9b2a8ea577f0",
   "original_schedule_week_fingerprint": "1bd667130b2a7bc4336013f5366dfff0bbbbd10eb10d2a39a216133e411b4e4c",
   "original_week_fingerprint": "ec237c65577b1cb882ff3611145aa6f248651d18e2e9028d687433840925bace",
+  "package_correction_policy": "If the original source snapshot cannot be reproduced exactly, decisions from the changed game are excluded from publication. Unchanged games whose source fingerprints still match may continue through human review.",
   "per_game_change": {
     "2026_01_DEN_KC": {
       "current_fingerprint": "049484764edd5d74e1f32742539b945b19bc66d1ca38270ec8526e8833073377",
@@ -71,9 +73,31 @@
       "docs/2026-week1-shadow-audit-report.md"
     ]
   },
+  "quarantine_is_not_a_correction_waiver": true,
+  "quarantined_game_decisions_may_be_selected": false,
+  "quarantined_game_ids": [
+    "2026_01_DEN_KC"
+  ],
   "ready_for_publication": false,
   "retention_finding": "The Milestone 9 report retained fingerprints and selected summaries, but explicitly left the original raw snapshot and generated machine artifacts outside the repository. They are absent from the current environment and upstream release assets were replaced, so changed rows/cells cannot be reconstructed exactly.",
   "schedule_diff_status": "week fingerprint changed; prior per-game schedule fingerprints and prior schedule snapshot are unavailable for an exact row diff",
+  "unchanged_game_fingerprints": {
+    "2026_01_ARI_LAC": "edbe670be5bf6cbac90d839525b0b4cb345fd319564ffbbbe46b59f391bcee36",
+    "2026_01_ATL_PIT": "c6ee93b969a465de1f029d4307d7cbb961ec56183f4dfe6e591f80abb248c20d",
+    "2026_01_BAL_IND": "420b65a3026d4858f19cf59b8dca47e68c6c17a8f97fdb7abc7c3f7e29142c5f",
+    "2026_01_BUF_HOU": "794808ec9b0f4f7fc92b46636a572c9350320f92d9d331f232b3896ecf68839a",
+    "2026_01_CHI_CAR": "a2e993b33f22352eae558e5eb7f7b7d4c7e58ec36d5ca9f762e41b271ed88f01",
+    "2026_01_CLE_JAX": "fcd4ad1cbace36aaaf12ec4bf7d8d2c68ed741482f782e7f35c07d51d59ff5b5",
+    "2026_01_DAL_NYG": "a7b506a25b60726b5727de715ded5de376561a46a9507a6342e537c8e0d2cf6a",
+    "2026_01_GB_MIN": "ffb23901568e59ed68b5eaa70fbc430fbdc9ce9511efc14a4bdc2b4b7fa9c0e6",
+    "2026_01_MIA_LV": "e89b0b0165bf5ffc9098bd8cbb1cba70035511deb582671d60e44947c319fcaa",
+    "2026_01_NE_SEA": "133ef85ca28c67000bff6ab75f7b6a698b067d8f2114b51446303a968720febe",
+    "2026_01_NO_DET": "c604d2113f16d960707dd46d6021bc4c0e8da875bced2d19aab18239cd56d253",
+    "2026_01_NYJ_TEN": "fe23cb1a02f5ac7baad7ed0a25b7a23bc661a24d689a666cc8616b1081ecf392",
+    "2026_01_SF_LA": "acb35f557da6b421b6926532b884bb0cbeb34be48cefd1bc5387471b58cde983",
+    "2026_01_TB_CIN": "532f36756232ab927c0d97d56a5cf182e03d91aee248765e5a1a744a890a2478",
+    "2026_01_WAS_PHI": "ac5545e61537e82b0f65d3c4b997722b3f34fb71e6cb1120b0a5a15c3c3ffa0e"
+  },
   "unchanged_game_ids": [
     "2026_01_ARI_LAC",
     "2026_01_ATL_PIT",
@@ -91,6 +115,7 @@
     "2026_01_TB_CIN",
     "2026_01_WAS_PHI"
   ],
+  "unchanged_games_may_proceed_to_human_review": true,
   "upstream_evidence": {
     "derived_release_updated_at_utc": "2026-09-15T14:20:02+00:00",
     "first_post_original_successful_run_started_at_utc": "2026-09-15T10:17:55+00:00",

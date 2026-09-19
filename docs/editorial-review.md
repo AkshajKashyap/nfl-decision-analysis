@@ -58,6 +58,14 @@ Approval use is fail-closed until the exact diff, regeneration, and a
 deterministic duplicate run all pass. A current rerun alone does not prove what
 changed in a prior snapshot.
 
+For the Week 1 package only, the documented archival failure is handled by
+quarantining every decision from the changed game. The original ten-case
+shortlist is formed first and then filtered; removed cases are not replaced.
+Only games whose retained Milestone 9 and correction-run fingerprints match
+may continue to human review. The inability to recover an old row-level
+snapshot is an archival limitation, not a scientific-model failure and not
+permission to waive correction evidence for the changed game.
+
 ## Shortlist and final selection
 
 The default shortlist contains ten publication-v1-safe cases. It round-robins

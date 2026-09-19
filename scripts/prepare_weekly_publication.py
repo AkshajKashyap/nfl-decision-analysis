@@ -44,9 +44,11 @@ def main() -> None:
     source_manifest = _load_json(args.source_manifest)
     audit_hashes = _load_json(args.audit_hashes)
     correction = _load_json(args.correction_check)
-    excluded = tuple(correction.get("excluded_game_ids", ()))
-    shortlist = deterministic_shortlist(
-        weekly, limit=args.shortlist_size, excluded_game_ids=excluded
+    original_shortlist = deterministic_shortlist(weekly, limit=args.shortlist_size)
+    shortlist, quarantined_decision_ids = _filter_shortlist_for_correction(
+        original_shortlist,
+        correction=correction,
+        source_manifest=source_manifest,
     )
     facts = _source_facts(args.pbp_parquet)
     warnings = {
@@ -69,6 +71,9 @@ def main() -> None:
             build_review_card(
                 record,
                 source_facts=facts[item_id],
+                source_game_fingerprint=source_manifest["per_game_fingerprints"][
+                    game_id
+                ],
                 tactical_warnings=warnings.get(item_id, ()),
                 correction_state=state,
             )
@@ -76,8 +81,8 @@ def main() -> None:
     close_call = select_close_call_companion(weekly)
     review_inputs = [card["editorial_review"] for card in cards]
     blockers = []
-    if not correction.get("ready_for_publication"):
-        blockers.append("source_correction_check_incomplete")
+    if not correction.get("unchanged_games_may_proceed_to_human_review"):
+        blockers.append("scoped_correction_policy_not_applied")
     if any(review["status"] == "pending_review" for review in review_inputs):
         blockers.append("human_editorial_review_pending")
     status = {
@@ -87,6 +92,11 @@ def main() -> None:
         "approved": 0,
         "held_or_rejected": 0,
         "pending_review": len(review_inputs),
+        "quarantined_game_ids": sorted(
+            set(correction.get("changed_game_ids", ()))
+            | set(correction.get("excluded_game_ids", ()))
+        ),
+        "quarantined_decision_ids": quarantined_decision_ids,
         "selected_decision_ids": [],
         "externally_published": False,
     }
@@ -117,15 +127,23 @@ def main() -> None:
         "package-status.json": _json(status),
         "review-cards.json": _json({"cards": cards}),
         "review-cards.md": _render_cards(cards),
+        "human-review.md": _render_cards(cards),
         "review-inputs.json": _json({"reviews": review_inputs}),
         "shortlist.json": _json(
             {
                 "selection_rule": (
-                    "publication-v1-safe only; frozen action-story round robin; "
-                    "one case per game before deterministic evidence-ordered fill"
+                    "form the original publication-v1-safe frozen shortlist first; "
+                    "then remove changed-game cases without replacement"
                 ),
-                "excluded_game_ids": list(excluded),
+                "original_decision_ids": [
+                    f"{record['identity']['game_id']}:"
+                    f"{int(record['identity']['play_id'])}"
+                    for record in original_shortlist
+                ],
+                "quarantined_game_ids": status["quarantined_game_ids"],
+                "quarantined_decision_ids": quarantined_decision_ids,
                 "decision_ids": [card["decision_id"] for card in cards],
+                "replacement_candidates_added": False,
             }
         ),
     }
@@ -183,12 +201,50 @@ def _source_facts(path: Path) -> dict[str, dict[str, Any]]:
     }
 
 
+def _filter_shortlist_for_correction(
+    original_shortlist: tuple[dict[str, Any], ...],
+    *,
+    correction: dict[str, Any],
+    source_manifest: dict[str, Any],
+) -> tuple[tuple[dict[str, Any], ...], list[str]]:
+    """Remove quarantined games from the fixed shortlist without backfilling."""
+
+    quarantined_games = set(correction.get("changed_game_ids", ())) | set(
+        correction.get("excluded_game_ids", ())
+    )
+    unchanged_games = set(correction.get("unchanged_game_ids", ()))
+    expected_fingerprints = correction.get("unchanged_game_fingerprints", {})
+    current_fingerprints = source_manifest.get("per_game_fingerprints", {})
+    retained = []
+    quarantined_decisions = []
+    for record in original_shortlist:
+        game_id = str(record["identity"]["game_id"])
+        item_id = f"{game_id}:{int(record['identity']['play_id'])}"
+        if game_id in quarantined_games:
+            quarantined_decisions.append(item_id)
+            continue
+        if game_id not in unchanged_games:
+            raise ValueError(
+                f"shortlisted game lacks unchanged-source proof: {game_id}"
+            )
+        expected = expected_fingerprints.get(game_id)
+        current = current_fingerprints.get(game_id)
+        if not expected or current != expected:
+            raise ValueError(f"shortlisted game fingerprint is not verified: {game_id}")
+        retained.append(record)
+    return tuple(retained), quarantined_decisions
+
+
 def _render_cards(cards: list[dict[str, Any]]) -> str:
     lines = [
         "# CoachIQ 2026 Week 1 human-review cards",
         "",
-        "Internal only. These records passed automated publication-v1 checks but "
-        "have not been approved by a human.",
+        "Internal only. Denver–Kansas City is quarantined and absent. Every card "
+        "below remains `pending_review`; automation has assigned no approval.",
+        "",
+        "For each card, return exactly one status: `approved`, "
+        "`hold_for_context`, `reject_data_issue`, or `reject_model_form_risk`, "
+        "plus a short reviewer note. Do not edit the evidence fields.",
         "",
     ]
     for card in cards:
@@ -198,35 +254,53 @@ def _render_cards(cards: list[dict[str, Any]]) -> str:
         output = card["coachiq_output"]
         comparison = output["comparison"]
         diagnostics = output["safety_diagnostics"]
+        modeled = {action["action"]: action for action in output["modeled_actions"]}
+        actual_name = str(factual["actual_action"])
+        favored_name = str(comparison["model_preferred_supported_action"])
+        comparison_name = str(comparison["claimed_comparison_action"])
+        actual_ewp = float(modeled[actual_name]["expected_win_probability"])
+        favored_ewp = float(modeled[favored_name]["expected_win_probability"])
+        pairwise = _favored_pairwise(comparison, favored_name, comparison_name)
         minutes, seconds = divmod(int(situation["quarter_seconds_remaining"]), 60)
         lines.extend(
             (
                 f"## {card['decision_id']}",
                 "",
-                f"- Game: {identity['away_team']} at {identity['home_team']}",
-                f"- Situation: Q{situation['quarter']} {minutes}:{seconds:02d}; "
-                f"{identity['possession_team']} "
-                f"{situation['possession_team_score']}-"
-                f"{situation['defense_team_score']}; fourth-and-"
-                f"{situation['yards_to_go']:g}; yards to goal "
-                f"{situation['yards_to_goal']:g}",
-                f"- Actual action / outcome: `{factual['actual_action']}` / "
-                f"`{factual['factual_outcome']}`",
-                f"- Source description: {factual['source_description']}",
-                f"- CoachIQ favored: "
-                f"`{comparison['model_preferred_supported_action']}`; claimed gap "
-                f"{float(comparison['claimed_comparison_gap']) * 100:.2f} pp; "
-                f"minimum superiority "
-                f"{float(comparison['minimum_pairwise_superiority']):.3f}",
-                f"- Publication: `{card['publication']['status']}`; reasons: "
-                f"{card['publication']['withholding_reasons'] or 'none'}; warnings: "
-                f"{card['tactical_context_warnings'] or 'none'}",
-                f"- Safety maxima: field "
+                "### Factual play",
+                "",
+                f"- Matchup / play: {identity['away_team']} at "
+                f"{identity['home_team']}, play `{identity['play_id']}`",
+                f"- Quarter / clock: Q{situation['quarter']} {minutes}:{seconds:02d}",
+                f"- Score: {identity['possession_team']} "
+                f"{situation['possession_team_score']}, "
+                f"{_defense_team(identity)} {situation['defense_team_score']}",
+                f"- Possession: `{identity['possession_team']}`",
+                f"- Down / distance: fourth-and-{situation['yards_to_go']:g}",
+                f"- Field position: {_field_position(identity, situation)}",
+                f"- Raw description: {factual['source_description']}",
+                f"- Actual action: `{actual_name}`",
+                f"- Factual outcome: `{factual['factual_outcome']}`",
+                "",
+                "### Model evidence and safety",
+                "",
+                f"- CoachIQ-favored action: `{favored_name}`",
+                f"- Actual-action EWP: {actual_ewp:.2%}",
+                f"- Favored-action EWP: {favored_ewp:.2%}",
+                f"- Modeled gap: {float(comparison['claimed_comparison_gap']):.2%} "
+                f"over `{comparison_name}`",
+                f"- Pairwise superiority: {pairwise['superiority']:.3f}",
+                f"- 90% paired difference interval: "
+                f"{pairwise['lower']:.2%} to {pairwise['upper']:.2%}",
+                f"- Field clipping maximum: "
                 f"{float(diagnostics['maximum_field_clipping_mass']):.3%}; clock "
-                f"{float(diagnostics['maximum_clock_clipping_mass']):.3%}; OT "
+                f"clipping maximum: "
+                f"{float(diagnostics['maximum_clock_clipping_mass']):.3%}",
+                f"- OT-boundary mass: "
                 f"{float(diagnostics['maximum_overtime_boundary_mass']):.3%}",
+                f"- Tactical-context warnings: "
+                f"{card['tactical_context_warnings'] or 'none'}",
                 f"- Source correction state: `{card['source_correction_state']}`",
-                f"- Source fingerprint: `{card['provenance']['source']['sha256']}`",
+                f"- Game source fingerprint: `{card['source_game_fingerprint']}`",
                 f"- Versions: `{card['provenance']['wp_model_version']}`, "
                 f"`{card['provenance']['action_transition_model_version']}`, "
                 f"`{card['provenance']['decision_value_version']}`, "
@@ -263,16 +337,61 @@ def _render_cards(cards: list[dict[str, Any]]) -> str:
         lines.extend(
             (
                 "",
-                "Pairwise evidence and the complete automated source-verification "
-                "checklist are retained in `review-cards.json`.",
+                f"Proposed neutral public sentence: {card['neutral_public_language']}",
                 "",
-                f"Proposed neutral wording: {card['neutral_public_language']}",
+                "### Human response",
                 "",
-                "Human result: `pending_review`",
+                "- Status: `pending_review`",
+                "- Allowed final status: `approved` / `hold_for_context` / "
+                "`reject_data_issue` / `reject_model_form_risk`",
+                "- Reviewer notes: _",
                 "",
             )
         )
     return "\n".join(lines)
+
+
+def _favored_pairwise(
+    comparison: dict[str, Any], favored: str, compared: str
+) -> dict[str, float]:
+    for evidence in comparison["pairwise_evidence"]:
+        if not evidence["available"] or {
+            evidence["action_a"],
+            evidence["action_b"],
+        } != {
+            favored,
+            compared,
+        }:
+            continue
+        if evidence["action_a"] == favored:
+            return {
+                "superiority": float(evidence["probability_a_exceeds_b"]),
+                "lower": float(evidence["interval_lower"]),
+                "upper": float(evidence["interval_upper"]),
+            }
+        return {
+            "superiority": float(evidence["probability_b_exceeds_a"]),
+            "lower": -float(evidence["interval_upper"]),
+            "upper": -float(evidence["interval_lower"]),
+        }
+    raise ValueError(f"missing pairwise evidence for {favored} versus {compared}")
+
+
+def _field_position(identity: dict[str, Any], situation: dict[str, Any]) -> str:
+    yards_to_goal = float(situation["yards_to_goal"])
+    possession = str(identity["possession_team"])
+    defense = _defense_team(identity)
+    if yards_to_goal > 50:
+        return f"{possession} {100 - yards_to_goal:g}"
+    if yards_to_goal < 50:
+        return f"{defense} {yards_to_goal:g}"
+    return "50-yard line"
+
+
+def _defense_team(identity: dict[str, Any]) -> str:
+    possession = str(identity["possession_team"])
+    teams = (str(identity["away_team"]), str(identity["home_team"]))
+    return next(team for team in teams if team != possession)
 
 
 def _render_readiness(
@@ -296,9 +415,11 @@ def _render_readiness(
         "clear, and 43 publication-v1-safe decisions.",
         "- Two complete current-source runs were byte-identical apart from "
         "deliberately nondeterministic runtime metrics.",
-        f"- The internal shortlist contains {len(cards)} cases; "
-        "Denver–Kansas City is excluded while its source revision remains "
-        "unresolved.",
+        "- The original ten-case shortlist was formed before correction "
+        "filtering. Its Denver–Kansas City case was removed without backfill.",
+        f"- The unaffected human-review queue contains {len(cards)} cases.",
+        "- `2026_01_DEN_KC` remains quarantined. No decision from that game may "
+        "be selected for Week 1 publication.",
         f"- Human outcomes: {status['approved']} approved, "
         f"{status['held_or_rejected']} held/rejected, "
         f"{status['pending_review']} pending.",
@@ -308,36 +429,27 @@ def _render_readiness(
         "## Blocking issues",
         "",
     ]
-    if not correction.get("ready_for_publication"):
-        lines.append(
-            "1. The Week 1 schedule fingerprint changed and the PBP change is "
-            "isolated to `2026_01_DEN_KC`, but the original raw snapshot and "
-            "machine artifacts were not retained. Exact changed rows/cells and "
-            "the full downstream publication impact therefore cannot be proven."
-        )
-    number = 2 if not correction.get("ready_for_publication") else 1
     lines.extend(
         (
-            f"{number}. No human reviewer has supplied final checklist results. "
+            "1. No human reviewer has supplied final checklist results. "
             "Automation has left all candidates at `pending_review` and assigned "
             "no approvals.",
             "",
+            "## Quarantine evidence",
+            "",
+            "The original Denver–Kansas City row-level snapshot cannot be "
+            "recovered exactly. That is an archival limitation, not permission "
+            "to waive the correction check and not a scientific-model failure. "
+            "The changed game remains excluded under the Week 1 package policy.",
+            "",
             "## Required next step",
             "",
-            (
-                "Restore the original Milestone 9 schedule/PBP snapshot and machine "
-                "reports to complete the exact correction diff. Then have a named "
-                "human reviewer complete `review-inputs.json`. Only after both "
-                "gates pass may the tool select three to five approved cases and "
-                "emit `reports/2026/week-01.md`."
-                if not correction.get("ready_for_publication")
-                else "Have a named human reviewer complete `review-inputs.json`. "
-                "Then select three to five approved cases and run the gated public "
-                "package generation."
-            ),
+            "Have a named human reviewer return one allowed final status and notes "
+            "for every card in `human-review.md`. Do not select public cases or "
+            "generate `reports/2026/week-01.md` until those results are supplied.",
             "",
-            "See `correction-check.json`, `review-cards.md`, `review-cards.json`, "
-            "and `package-status.json` for the machine-readable evidence.",
+            "See `correction-check.json`, `human-review.md`, `review-cards.json`, "
+            "and `package-status.json`.",
             "",
         )
     )

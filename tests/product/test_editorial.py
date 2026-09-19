@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 
 import pytest
+from scripts.prepare_weekly_publication import _filter_shortlist_for_correction
 
 from coachiq.product import (
     HUMAN_REVIEW_CHECKS,
@@ -221,6 +222,49 @@ def test_shortlist_is_safe_varied_and_deterministic() -> None:
     )
 
 
+def test_correction_filter_removes_changed_game_without_backfill() -> None:
+    original = (
+        _record(1, game_id="2026_01_A_B"),
+        _record(2, game_id="2026_01_DEN_KC"),
+        _record(3, game_id="2026_01_C_D"),
+    )
+    retained, quarantined = _filter_shortlist_for_correction(
+        original,
+        correction={
+            "changed_game_ids": ["2026_01_DEN_KC"],
+            "excluded_game_ids": ["2026_01_DEN_KC"],
+            "unchanged_game_ids": ["2026_01_A_B", "2026_01_C_D"],
+            "unchanged_game_fingerprints": {
+                "2026_01_A_B": "a",
+                "2026_01_C_D": "c",
+            },
+        },
+        source_manifest={
+            "per_game_fingerprints": {
+                "2026_01_A_B": "a",
+                "2026_01_DEN_KC": "changed",
+                "2026_01_C_D": "c",
+            }
+        },
+    )
+
+    assert [record["identity"]["game_id"] for record in retained] == [
+        "2026_01_A_B",
+        "2026_01_C_D",
+    ]
+    assert quarantined == ["2026_01_DEN_KC:2"]
+
+    with pytest.raises(ValueError, match="fingerprint is not verified"):
+        _filter_shortlist_for_correction(
+            original[:1],
+            correction={
+                "unchanged_game_ids": ["2026_01_A_B"],
+                "unchanged_game_fingerprints": {"2026_01_A_B": "original"},
+            },
+            source_manifest={"per_game_fingerprints": {"2026_01_A_B": "changed"}},
+        )
+
+
 def test_only_human_can_approve_and_withholding_cannot_be_overridden() -> None:
     safe = _record(1)
     withheld = _record(2, publishable=False, classification="close_call")
@@ -244,6 +288,34 @@ def test_only_human_can_approve_and_withholding_cannot_be_overridden() -> None:
             safe,
             {**approval, "status": "pending_review"},
             correction_check=_correction(),
+        )
+
+
+def test_scoped_correction_allows_only_unchanged_games() -> None:
+    unchanged = _record(1, game_id="2026_01_A_B")
+    quarantined = _record(2, game_id="2026_01_DEN_KC")
+    correction = {
+        **_correction(ready=False),
+        "changed_game_ids": ["2026_01_DEN_KC"],
+        "excluded_game_ids": ["2026_01_DEN_KC"],
+        "quarantined_game_ids": ["2026_01_DEN_KC"],
+        "quarantine_is_not_a_correction_waiver": True,
+        "quarantined_game_decisions_may_be_selected": False,
+        "unchanged_game_ids": ["2026_01_A_B"],
+        "unchanged_game_fingerprints": {"2026_01_A_B": "a"},
+        "unchanged_games_may_proceed_to_human_review": True,
+    }
+
+    validate_human_review(
+        unchanged,
+        _review(unchanged),
+        correction_check=correction,
+    )
+    with pytest.raises(ValueError, match="exact diff is incomplete"):
+        validate_human_review(
+            quarantined,
+            _review(quarantined),
+            correction_check=correction,
         )
 
 

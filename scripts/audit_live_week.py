@@ -20,6 +20,7 @@ from coachiq.operations import (
     build_shadow_brief,
     compare_source_manifests,
     finalize_operational_evidence,
+    retain_week_source_snapshot,
     run_shadow_week,
     validate_live_shadow_request,
 )
@@ -141,6 +142,9 @@ def main() -> None:
             ),
         )
     export_started = perf_counter()
+    retain_week_source_snapshot(
+        args.output_dir, schedule, raw_pbp, report.source_manifest
+    )
     report = _write_outputs(args, report, report.source_manifest, weekly)
     exported_at = perf_counter()
     metrics = {

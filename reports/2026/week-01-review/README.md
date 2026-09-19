@@ -9,18 +9,23 @@ No public report, social package, visual payload, or publication manifest has be
 - All 16 scheduled games remain final and all 16 were processed.
 - The corrected frozen rerun retained 203 eligible, 200 valued, 62 clear, and 43 publication-v1-safe decisions.
 - Two complete current-source runs were byte-identical apart from deliberately nondeterministic runtime metrics.
-- The internal shortlist contains 10 cases; Denver–Kansas City is excluded while its source revision remains unresolved.
-- Human outcomes: 0 approved, 0 held/rejected, 10 pending.
+- The original ten-case shortlist was formed before correction filtering. Its Denver–Kansas City case was removed without backfill.
+- The unaffected human-review queue contains 9 cases.
+- `2026_01_DEN_KC` remains quarantined. No decision from that game may be selected for Week 1 publication.
+- Human outcomes: 0 approved, 0 held/rejected, 9 pending.
 - Close-call companion: `2026_01_GB_MIN:2440`.
 - External publication state: `false`.
 
 ## Blocking issues
 
-1. The Week 1 schedule fingerprint changed and the PBP change is isolated to `2026_01_DEN_KC`, but the original raw snapshot and machine artifacts were not retained. Exact changed rows/cells and the full downstream publication impact therefore cannot be proven.
-2. No human reviewer has supplied final checklist results. Automation has left all candidates at `pending_review` and assigned no approvals.
+1. No human reviewer has supplied final checklist results. Automation has left all candidates at `pending_review` and assigned no approvals.
+
+## Quarantine evidence
+
+The original Denver–Kansas City row-level snapshot cannot be recovered exactly. That is an archival limitation, not permission to waive the correction check and not a scientific-model failure. The changed game remains excluded under the Week 1 package policy.
 
 ## Required next step
 
-Restore the original Milestone 9 schedule/PBP snapshot and machine reports to complete the exact correction diff. Then have a named human reviewer complete `review-inputs.json`. Only after both gates pass may the tool select three to five approved cases and emit `reports/2026/week-01.md`.
+Have a named human reviewer return one allowed final status and notes for every card in `human-review.md`. Do not select public cases or generate `reports/2026/week-01.md` until those results are supplied.
 
-See `correction-check.json`, `review-cards.md`, `review-cards.json`, and `package-status.json` for the machine-readable evidence.
+See `correction-check.json`, `human-review.md`, `review-cards.json`, and `package-status.json`.

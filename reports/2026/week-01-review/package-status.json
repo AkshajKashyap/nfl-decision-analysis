@@ -1,13 +1,18 @@
 {
   "approved": 0,
   "blockers": [
-    "source_correction_check_incomplete",
     "human_editorial_review_pending"
   ],
   "externally_published": false,
   "held_or_rejected": 0,
-  "pending_review": 10,
+  "pending_review": 9,
   "publication_package_ready": false,
+  "quarantined_decision_ids": [
+    "2026_01_DEN_KC:1624"
+  ],
+  "quarantined_game_ids": [
+    "2026_01_DEN_KC"
+  ],
   "selected_decision_ids": [],
-  "shortlist_size": 10
+  "shortlist_size": 9
 }
