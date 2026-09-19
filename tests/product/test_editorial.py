@@ -311,7 +311,7 @@ def test_scoped_correction_allows_only_unchanged_games() -> None:
         _review(unchanged),
         correction_check=correction,
     )
-    with pytest.raises(ValueError, match="exact diff is incomplete"):
+    with pytest.raises(ValueError, match="quarantined source game"):
         validate_human_review(
             quarantined,
             _review(quarantined),
@@ -368,6 +368,19 @@ def test_package_manifest_correction_gate_and_bytes_are_deterministic() -> None:
     assert manifest["report_sha256"]
     assert "coachiq-publication-v1" in first["week-01.md"]
     assert not prohibited_language_violations(first["week-01.md"])
+
+    without_companion = build_publication_package(
+        **kwargs, include_close_call_companion=False
+    )
+    without_companion_json = json.loads(without_companion["week-01.json"])
+    without_companion_manifest = json.loads(
+        without_companion["publication-manifest.json"]
+    )
+    assert without_companion_json["close_call_companion"] is None
+    assert without_companion_manifest["close_call_companion_id"] is None
+    assert "A close-call companion" not in without_companion["week-01.md"]
+    assert without_companion["week-01.md"].count("frozen publication filters") == 1
+    assert "publication-v1 safety checks" not in without_companion["week-01.md"]
 
     with pytest.raises(ValueError, match="exact diff is incomplete"):
         build_publication_package(

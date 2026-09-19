@@ -1,0 +1,85 @@
+{
+  "decisions": [
+    {
+      "actual_action": "go",
+      "actual_action_ewp": 0.31119032213628683,
+      "coachiq_favored_action": "go",
+      "decision_id": "2026_01_NE_SEA:3657",
+      "defense_team_score": 13,
+      "favored_action_ewp": 0.31119032213628683,
+      "matchup": "NE at SEA",
+      "modeled_gap": 0.06991622528359392,
+      "possession_team_score": 10,
+      "quarter": 4,
+      "quarter_seconds_remaining": 229,
+      "support_indicator": {
+        "go": {
+          "games": 180,
+          "observations": 187,
+          "status": "supported"
+        },
+        "punt": {
+          "games": 2988,
+          "observations": 17007,
+          "status": "supported"
+        }
+      },
+      "yards_to_go": 2.0,
+      "yards_to_goal": 65.0
+    },
+    {
+      "actual_action": "go",
+      "actual_action_ewp": 0.24780894954420096,
+      "coachiq_favored_action": "go",
+      "decision_id": "2026_01_BUF_HOU:3022",
+      "defense_team_score": 27,
+      "favored_action_ewp": 0.24780894954420096,
+      "matchup": "BUF at HOU",
+      "modeled_gap": 0.06020599833059917,
+      "possession_team_score": 21,
+      "quarter": 3,
+      "quarter_seconds_remaining": 170,
+      "support_indicator": {
+        "go": {
+          "games": 580,
+          "observations": 664,
+          "status": "supported"
+        },
+        "punt": {
+          "games": 2988,
+          "observations": 17007,
+          "status": "supported"
+        }
+      },
+      "yards_to_go": 1.0,
+      "yards_to_goal": 63.0
+    },
+    {
+      "actual_action": "punt",
+      "actual_action_ewp": 0.6593020505682516,
+      "coachiq_favored_action": "go",
+      "decision_id": "2026_01_ATL_PIT:3430",
+      "defense_team_score": 10,
+      "favored_action_ewp": 0.6843930063434189,
+      "matchup": "ATL at PIT",
+      "modeled_gap": 0.02509095577516729,
+      "possession_team_score": 13,
+      "quarter": 3,
+      "quarter_seconds_remaining": 13,
+      "support_indicator": {
+        "go": {
+          "games": 321,
+          "observations": 341,
+          "status": "supported"
+        },
+        "punt": {
+          "games": 2988,
+          "observations": 17007,
+          "status": "supported"
+        }
+      },
+      "yards_to_go": 3.0,
+      "yards_to_goal": 61.0
+    }
+  ]
+}

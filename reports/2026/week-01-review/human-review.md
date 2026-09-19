@@ -1,8 +1,8 @@
 # CoachIQ 2026 Week 1 human-review cards
 
-Internal only. Denver–Kansas City is quarantined and absent. Every card below remains `pending_review`; automation has assigned no approval.
+Internal only. Denver–Kansas City is quarantined and absent. Pending human reviews: 0.
 
-For each card, return exactly one status: `approved`, `hold_for_context`, `reject_data_issue`, or `reject_model_form_risk`, plus a short reviewer note. Do not edit the evidence fields.
+Human review is complete. Final reviewer identity, timestamp, status, and notes are recorded with each card.
 
 ## 2026_01_ARI_LAC:3127
 
@@ -43,9 +43,11 @@ Proposed neutral public sentence: On 4th-and-1 from their own 40, CoachIQ favore
 
 ### Human response
 
-- Status: `pending_review`
+- Status: `approved`
+- Reviewer: Akshaj Kashyap
+- Reviewed at UTC: `2026-09-19T02:41:06Z`
 - Allowed final status: `approved` / `hold_for_context` / `reject_data_issue` / `reject_model_form_risk`
-- Reviewer notes: _
+- Reviewer notes: Factual state and punt are coherent; no unusual tactical context identified. Strong go-over-punt model preference with low clipping and complete supported comparison.
 
 ## 2026_01_NE_SEA:3657
 
@@ -86,9 +88,11 @@ Proposed neutral public sentence: On 4th-and-2 from their own 35, CoachIQ favore
 
 ### Human response
 
-- Status: `pending_review`
+- Status: `approved`
+- Reviewer: Akshaj Kashyap
+- Reviewed at UTC: `2026-09-19T02:41:06Z`
 - Allowed final status: `approved` / `hold_for_context` / `reject_data_issue` / `reject_model_form_risk`
-- Reviewer notes: _
+- Reviewer notes: Late-game 4th-and-2 while trailing three is correctly reconstructed; actual go attempt and conversion are verified. No tactical or model-form reason to withhold.
 
 ## 2026_01_WAS_PHI:649
 
@@ -129,9 +133,11 @@ Proposed neutral public sentence: On 4th-and-21 from their own 28, CoachIQ favor
 
 ### Human response
 
-- Status: `pending_review`
+- Status: `approved`
+- Reviewer: Akshaj Kashyap
+- Reviewed at UTC: `2026-09-19T02:41:06Z`
 - Allowed final status: `approved` / `hold_for_context` / `reject_data_issue` / `reject_model_form_risk`
-- Reviewer notes: _
+- Reviewer notes: Straightforward early-game 4th-and-21 punt with clean support and negligible clipping. Factual and modeled comparison are suitable for publication, though low editorial priority because the conclusion is unsurprising.
 
 ## 2026_01_BUF_HOU:3022
 
@@ -172,9 +178,11 @@ Proposed neutral public sentence: On 4th-and-1 from their own 37, CoachIQ favore
 
 ### Human response
 
-- Status: `pending_review`
+- Status: `approved`
+- Reviewer: Akshaj Kashyap
+- Reviewed at UTC: `2026-09-19T02:41:06Z`
 - Allowed final status: `approved` / `hold_for_context` / `reject_data_issue` / `reject_model_form_risk`
-- Reviewer notes: _
+- Reviewer notes: Fourth-and-1 while trailing six is a legitimate decision point; actual go attempt is correctly represented and comparison has strong support with minimal clipping. No unusual tactical context identified.
 
 ## 2026_01_CHI_CAR:832
 
@@ -215,9 +223,11 @@ Proposed neutral public sentence: On 4th-and-13 from their own 37, CoachIQ favor
 
 ### Human response
 
-- Status: `pending_review`
+- Status: `approved`
+- Reviewer: Akshaj Kashyap
+- Reviewed at UTC: `2026-09-19T02:41:06Z`
 - Allowed final status: `approved` / `hold_for_context` / `reject_data_issue` / `reject_model_form_risk`
-- Reviewer notes: _
+- Reviewer notes: Straightforward early-game 4th-and-13 punt; factual state is coherent, clipping is low, and no tactical complication is apparent. Suitable but low editorial priority.
 
 ## 2026_01_ATL_PIT:3430
 
@@ -258,9 +268,11 @@ Proposed neutral public sentence: On 4th-and-3 from their own 39, CoachIQ favore
 
 ### Human response
 
-- Status: `pending_review`
+- Status: `approved`
+- Reviewer: Akshaj Kashyap
+- Reviewed at UTC: `2026-09-19T02:41:06Z`
 - Allowed final status: `approved` / `hold_for_context` / `reject_data_issue` / `reject_model_form_risk`
-- Reviewer notes: _
+- Reviewer notes: Fourth-and-3 from own territory near the end of Q3 is a legitimate go-versus-punt comparison. Quarter expiration does not create a special end-of-half/game constraint; evidence and clipping are clean.
 
 ## 2026_01_TB_CIN:460
 
@@ -301,9 +313,11 @@ Proposed neutral public sentence: On 4th-and-6 from their own 30, CoachIQ favore
 
 ### Human response
 
-- Status: `pending_review`
+- Status: `approved`
+- Reviewer: Akshaj Kashyap
+- Reviewed at UTC: `2026-09-19T02:41:06Z`
 - Allowed final status: `approved` / `hold_for_context` / `reject_data_issue` / `reject_model_form_risk`
-- Reviewer notes: _
+- Reviewer notes: Straightforward first-quarter 4th-and-6 punt; factual play and game state are coherent with very low clipping and strong historical support. Suitable but low editorial priority.
 
 ## 2026_01_NYJ_TEN:2539
 
@@ -344,9 +358,11 @@ Proposed neutral public sentence: On 4th-and-3 from their own 39, CoachIQ favore
 
 ### Human response
 
-- Status: `pending_review`
+- Status: `approved`
+- Reviewer: Akshaj Kashyap
+- Reviewed at UTC: `2026-09-19T02:41:06Z`
 - Allowed final status: `approved` / `hold_for_context` / `reject_data_issue` / `reject_model_form_risk`
-- Reviewer notes: _
+- Reviewer notes: Trailing by two touchdowns in Q3 makes this a meaningful go-versus-punt decision. No unusual tactical context or safety issue identified; comparison clears the frozen publication criteria.
 
 ## 2026_01_GB_MIN:479
 
@@ -387,6 +403,8 @@ Proposed neutral public sentence: On 4th-and-10 from their own 45, CoachIQ favor
 
 ### Human response
 
-- Status: `pending_review`
+- Status: `reject_model_form_risk`
+- Reviewer: Akshaj Kashyap
+- Reviewed at UTC: `2026-09-19T02:41:06Z`
 - Allowed final status: `approved` / `hold_for_context` / `reject_data_issue` / `reject_model_form_risk`
-- Reviewer notes: _
+- Reviewer notes: Punt comparison has 9.743% field clipping, effectively at publication-v1's 10% ceiling. Because boundary behavior of the v1 punt model is a known limitation, exclude this case from the first public package despite formally passing the automated threshold.

@@ -1,0 +1,18 @@
+{
+  "authorized_omissions": [
+    "2026_01_ARI_LAC:3127",
+    "2026_01_NYJ_TEN:2539",
+    "2026_01_GB_MIN:2440"
+  ],
+  "not_selected_approved_decision_ids": [
+    "2026_01_WAS_PHI:649",
+    "2026_01_CHI_CAR:832",
+    "2026_01_TB_CIN:460"
+  ],
+  "optional_fifth_decision_id": null,
+  "selected_decision_ids": [
+    "2026_01_NE_SEA:3657",
+    "2026_01_BUF_HOU:3022",
+    "2026_01_ATL_PIT:3430"
+  ]
+}

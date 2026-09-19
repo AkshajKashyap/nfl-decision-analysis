@@ -1,5 +1,7 @@
 {
-  "reviews": [
+  "close_call_companion_id": null,
+  "correction_check_timestamp": "2026-09-19T03:21:15.022955+00:00",
+  "editorial_results": [
     {
       "checklist": {
         "actual_action_classification": true,
@@ -225,5 +227,37 @@
       "reviewer_type": "human",
       "status": "reject_model_form_risk"
     }
-  ]
+  ],
+  "externally_published": false,
+  "generated_at_utc": "2026-09-19T03:21:20Z",
+  "json_sha256": "b1af734125924ea2d9e6d96cfd543f84632bbe8d7786587c0439e85a8f18a226",
+  "prepublication_source_fingerprint": "7ba171678321b0156c7f14630f9dce4eb52b112809da9e384969b143a358a655",
+  "report_sha256": "25212bba3bd3574b361e9911fa419bd3b7adc5407c374b02cacdfa3abaa14691",
+  "reviewer_timestamps": {
+    "2026_01_ARI_LAC:3127": "2026-09-19T02:41:06Z",
+    "2026_01_ATL_PIT:3430": "2026-09-19T02:41:06Z",
+    "2026_01_BUF_HOU:3022": "2026-09-19T02:41:06Z",
+    "2026_01_CHI_CAR:832": "2026-09-19T02:41:06Z",
+    "2026_01_GB_MIN:479": "2026-09-19T02:41:06Z",
+    "2026_01_NE_SEA:3657": "2026-09-19T02:41:06Z",
+    "2026_01_NYJ_TEN:2539": "2026-09-19T02:41:06Z",
+    "2026_01_TB_CIN:460": "2026-09-19T02:41:06Z",
+    "2026_01_WAS_PHI:649": "2026-09-19T02:41:06Z"
+  },
+  "season": 2026,
+  "selected_decision_ids": [
+    "2026_01_NE_SEA:3657",
+    "2026_01_BUF_HOU:3022",
+    "2026_01_ATL_PIT:3430"
+  ],
+  "source_fingerprint": "9466803a539cc2950406ab110bed922b57d8da8c3c56562fa5d566e980ffb899",
+  "source_retrieved_at_utc": "2026-09-15T17:29:29.810796+00:00",
+  "versions": {
+    "action_transition_model_version": "coachiq-action-transition-v1",
+    "decision_value_version": "coachiq-decision-v1",
+    "publication_policy_version": "coachiq-publication-v1",
+    "wp_model_version": "coachiq-wp-v1"
+  },
+  "visual_payload_sha256": "9efeb0ceb76a2fef8f52114a156ca506c77f816f8b99dd4dd4233e41b8e25f3d",
+  "week": 1
 }

@@ -1,0 +1,108 @@
+{
+  "all_selected_fingerprints_match": true,
+  "audit_evidence_week_fingerprint": "7ba171678321b0156c7f14630f9dce4eb52b112809da9e384969b143a358a655",
+  "blocking_reasons": [],
+  "changed_game_ids": [
+    "2026_01_ARI_LAC",
+    "2026_01_DEN_KC",
+    "2026_01_GB_MIN",
+    "2026_01_NYJ_TEN"
+  ],
+  "changed_since_human_review_game_ids": [
+    "2026_01_ARI_LAC",
+    "2026_01_GB_MIN",
+    "2026_01_NYJ_TEN"
+  ],
+  "check_purpose": "immediate_prepublication_source_gate",
+  "checked_at_utc": "2026-09-19T03:21:15.022955+00:00",
+  "close_call_companion_id": null,
+  "close_call_companion_omitted_by_authorization": true,
+  "current_audit_regenerated": true,
+  "current_pbp_file_sha256": "b3105320db58bb7e4b327f47e1b6cdd3bd7520d6121d0e22c45841d540dd6dd8",
+  "current_schedule_file_sha256": "7cd46295fae47c2f02d502bf81d9d8971c31ba012bc2583e5333191e748778c5",
+  "current_schedule_fingerprint": "6c672726efbb168abd72afaf94e7c220c38683709f71280a62959946bb831366",
+  "current_week_fingerprint": "7ba171678321b0156c7f14630f9dce4eb52b112809da9e384969b143a358a655",
+  "deterministic_rerun_passed": true,
+  "exact_diff_complete": false,
+  "exact_diff_limitation": "Reviewed raw snapshots were not retained for quarantined games; those games remain excluded. Exact diffs are not required for the unchanged selected-game scope.",
+  "excluded_game_ids": [
+    "2026_01_ARI_LAC",
+    "2026_01_DEN_KC",
+    "2026_01_GB_MIN",
+    "2026_01_NYJ_TEN"
+  ],
+  "externally_published": false,
+  "fresh_source_snapshot_id": "e0510a9db87407c871cd32eb082ea74d06aefd8bede2af9cc43c547e69f74b53",
+  "fresh_source_snapshot_retained": true,
+  "previously_quarantined_game_ids": [
+    "2026_01_DEN_KC"
+  ],
+  "quarantine_is_not_a_correction_waiver": true,
+  "quarantined_game_decisions_may_be_selected": false,
+  "quarantined_game_ids": [
+    "2026_01_ARI_LAC",
+    "2026_01_DEN_KC",
+    "2026_01_GB_MIN",
+    "2026_01_NYJ_TEN"
+  ],
+  "ready_for_publication": true,
+  "reviewed_schedule_fingerprint": "6c672726efbb168abd72afaf94e7c220c38683709f71280a62959946bb831366",
+  "reviewed_week_fingerprint": "9466803a539cc2950406ab110bed922b57d8da8c3c56562fa5d566e980ffb899",
+  "selected_changed_game_ids": [],
+  "selected_decision_ids": [
+    "2026_01_NE_SEA:3657",
+    "2026_01_BUF_HOU:3022",
+    "2026_01_ATL_PIT:3430"
+  ],
+  "selected_game_fingerprints": {
+    "2026_01_ATL_PIT": {
+      "current": "c6ee93b969a465de1f029d4307d7cbb961ec56183f4dfe6e591f80abb248c20d",
+      "matches": true,
+      "reviewed": "c6ee93b969a465de1f029d4307d7cbb961ec56183f4dfe6e591f80abb248c20d"
+    },
+    "2026_01_BUF_HOU": {
+      "current": "794808ec9b0f4f7fc92b46636a572c9350320f92d9d331f232b3896ecf68839a",
+      "matches": true,
+      "reviewed": "794808ec9b0f4f7fc92b46636a572c9350320f92d9d331f232b3896ecf68839a"
+    },
+    "2026_01_NE_SEA": {
+      "current": "133ef85ca28c67000bff6ab75f7b6a698b067d8f2114b51446303a968720febe",
+      "matches": true,
+      "reviewed": "133ef85ca28c67000bff6ab75f7b6a698b067d8f2114b51446303a968720febe"
+    }
+  },
+  "selected_game_ids": [
+    "2026_01_ATL_PIT",
+    "2026_01_BUF_HOU",
+    "2026_01_NE_SEA"
+  ],
+  "unchanged_game_fingerprints": {
+    "2026_01_ATL_PIT": "c6ee93b969a465de1f029d4307d7cbb961ec56183f4dfe6e591f80abb248c20d",
+    "2026_01_BAL_IND": "420b65a3026d4858f19cf59b8dca47e68c6c17a8f97fdb7abc7c3f7e29142c5f",
+    "2026_01_BUF_HOU": "794808ec9b0f4f7fc92b46636a572c9350320f92d9d331f232b3896ecf68839a",
+    "2026_01_CHI_CAR": "a2e993b33f22352eae558e5eb7f7b7d4c7e58ec36d5ca9f762e41b271ed88f01",
+    "2026_01_CLE_JAX": "fcd4ad1cbace36aaaf12ec4bf7d8d2c68ed741482f782e7f35c07d51d59ff5b5",
+    "2026_01_DAL_NYG": "a7b506a25b60726b5727de715ded5de376561a46a9507a6342e537c8e0d2cf6a",
+    "2026_01_MIA_LV": "e89b0b0165bf5ffc9098bd8cbb1cba70035511deb582671d60e44947c319fcaa",
+    "2026_01_NE_SEA": "133ef85ca28c67000bff6ab75f7b6a698b067d8f2114b51446303a968720febe",
+    "2026_01_NO_DET": "c604d2113f16d960707dd46d6021bc4c0e8da875bced2d19aab18239cd56d253",
+    "2026_01_SF_LA": "acb35f557da6b421b6926532b884bb0cbeb34be48cefd1bc5387471b58cde983",
+    "2026_01_TB_CIN": "532f36756232ab927c0d97d56a5cf182e03d91aee248765e5a1a744a890a2478",
+    "2026_01_WAS_PHI": "ac5545e61537e82b0f65d3c4b997722b3f34fb71e6cb1120b0a5a15c3c3ffa0e"
+  },
+  "unchanged_game_ids": [
+    "2026_01_ATL_PIT",
+    "2026_01_BAL_IND",
+    "2026_01_BUF_HOU",
+    "2026_01_CHI_CAR",
+    "2026_01_CLE_JAX",
+    "2026_01_DAL_NYG",
+    "2026_01_MIA_LV",
+    "2026_01_NE_SEA",
+    "2026_01_NO_DET",
+    "2026_01_SF_LA",
+    "2026_01_TB_CIN",
+    "2026_01_WAS_PHI"
+  ],
+  "unchanged_games_may_proceed_to_human_review": true
+}

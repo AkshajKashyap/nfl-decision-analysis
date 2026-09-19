@@ -17,6 +17,7 @@ from coachiq.product import (
     build_review_card,
     deterministic_shortlist,
     select_close_call_companion,
+    validate_human_review,
 )
 
 
@@ -28,12 +29,14 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--audit-hashes", type=Path, required=True)
     parser.add_argument("--pbp-parquet", type=Path, required=True)
     parser.add_argument("--correction-check", type=Path, required=True)
+    parser.add_argument("--publication-correction-check", type=Path)
     parser.add_argument("--review-output-dir", type=Path, required=True)
     parser.add_argument("--shortlist-size", type=int, default=10)
     parser.add_argument("--reviews-json", type=Path)
     parser.add_argument("--selected-ids-json", type=Path)
     parser.add_argument("--public-output-dir", type=Path)
     parser.add_argument("--generated-at-utc")
+    parser.add_argument("--omit-close-call-companion", action="store_true")
     return parser.parse_args()
 
 
@@ -44,6 +47,11 @@ def main() -> None:
     source_manifest = _load_json(args.source_manifest)
     audit_hashes = _load_json(args.audit_hashes)
     correction = _load_json(args.correction_check)
+    publication_correction = (
+        _load_json(args.publication_correction_check)
+        if args.publication_correction_check is not None
+        else correction
+    )
     original_shortlist = deterministic_shortlist(weekly, limit=args.shortlist_size)
     shortlist, quarantined_decision_ids = _filter_shortlist_for_correction(
         original_shortlist,
@@ -79,25 +87,73 @@ def main() -> None:
             )
         )
     close_call = select_close_call_companion(weekly)
-    review_inputs = [card["editorial_review"] for card in cards]
+    records_by_id = {
+        f"{record['identity']['game_id']}:{int(record['identity']['play_id'])}": record
+        for record in shortlist
+    }
+    review_inputs = (
+        _load_json(args.reviews_json)["reviews"]
+        if args.reviews_json is not None
+        else [card["editorial_review"] for card in cards]
+    )
+    reviews_by_id = _validate_review_inputs(
+        review_inputs,
+        records_by_id=records_by_id,
+        correction=correction,
+        require_final=args.reviews_json is not None,
+    )
+    cards = [
+        {**card, "editorial_review": reviews_by_id[card["decision_id"]]}
+        for card in cards
+    ]
+    public_values = (
+        args.selected_ids_json,
+        args.public_output_dir,
+        args.generated_at_utc,
+    )
+    if any(value is not None for value in public_values) and not all(
+        value is not None for value in public_values
+    ):
+        raise SystemExit(
+            "public generation requires reviews, selected IDs, output directory, "
+            "and generated timestamp"
+        )
+    if any(value is not None for value in public_values) and args.reviews_json is None:
+        raise SystemExit("public generation requires final human reviews")
+    if (
+        any(value is not None for value in public_values)
+        and args.publication_correction_check is None
+    ):
+        raise SystemExit(
+            "public generation requires an explicit prepublication correction check"
+        )
+    selected = (
+        _load_json(args.selected_ids_json)["selected_decision_ids"]
+        if args.selected_ids_json is not None
+        else []
+    )
     blockers = []
     if not correction.get("unchanged_games_may_proceed_to_human_review"):
         blockers.append("scoped_correction_policy_not_applied")
     if any(review["status"] == "pending_review" for review in review_inputs):
         blockers.append("human_editorial_review_pending")
+    if not selected:
+        blockers.append("publication_selection_pending")
+    approved = sum(review["status"] == "approved" for review in review_inputs)
+    pending = sum(review["status"] == "pending_review" for review in review_inputs)
     status = {
         "publication_package_ready": not blockers,
         "blockers": blockers,
         "shortlist_size": len(cards),
-        "approved": 0,
-        "held_or_rejected": 0,
-        "pending_review": len(review_inputs),
+        "approved": approved,
+        "held_or_rejected": len(review_inputs) - approved - pending,
+        "pending_review": pending,
         "quarantined_game_ids": sorted(
             set(correction.get("changed_game_ids", ()))
             | set(correction.get("excluded_game_ids", ()))
         ),
         "quarantined_decision_ids": quarantined_decision_ids,
-        "selected_decision_ids": [],
+        "selected_decision_ids": selected,
         "externally_published": False,
     }
     artifacts = {
@@ -149,27 +205,15 @@ def main() -> None:
     }
     _write_artifacts(args.review_output_dir, artifacts)
 
-    public_args = (
-        args.reviews_json,
-        args.selected_ids_json,
-        args.public_output_dir,
-        args.generated_at_utc,
-    )
-    if any(value is not None for value in public_args):
-        if not all(value is not None for value in public_args):
-            raise SystemExit(
-                "public generation requires reviews, selected IDs, output directory, "
-                "and generated timestamp"
-            )
-        reviews = _load_json(args.reviews_json)["reviews"]
-        selected = _load_json(args.selected_ids_json)["selected_decision_ids"]
+    if selected:
         public = build_publication_package(
             weekly=weekly,
             review_cards=cards,
-            reviews=reviews,
+            reviews=review_inputs,
             selected_decision_ids=selected,
-            correction_check=correction,
+            correction_check=publication_correction,
             generated_at_utc=args.generated_at_utc,
+            include_close_call_companion=not args.omit_close_call_companion,
         )
         _write_artifacts(args.public_output_dir, public)
 
@@ -235,16 +279,43 @@ def _filter_shortlist_for_correction(
     return tuple(retained), quarantined_decisions
 
 
+def _validate_review_inputs(
+    reviews: list[dict[str, Any]],
+    *,
+    records_by_id: dict[str, dict[str, Any]],
+    correction: dict[str, Any],
+    require_final: bool,
+) -> dict[str, dict[str, Any]]:
+    reviews_by_id = {str(review.get("decision_id")): review for review in reviews}
+    if len(reviews_by_id) != len(reviews) or set(reviews_by_id) != set(records_by_id):
+        raise ValueError("every shortlisted case requires exactly one review input")
+    if require_final:
+        for item_id, review in reviews_by_id.items():
+            validate_human_review(
+                records_by_id[item_id], review, correction_check=correction
+            )
+    return reviews_by_id
+
+
 def _render_cards(cards: list[dict[str, Any]]) -> str:
+    pending = sum(
+        card["editorial_review"]["status"] == "pending_review" for card in cards
+    )
     lines = [
         "# CoachIQ 2026 Week 1 human-review cards",
         "",
-        "Internal only. Denver–Kansas City is quarantined and absent. Every card "
-        "below remains `pending_review`; automation has assigned no approval.",
+        "Internal only. Denver–Kansas City is quarantined and absent. "
+        f"Pending human reviews: {pending}.",
         "",
-        "For each card, return exactly one status: `approved`, "
-        "`hold_for_context`, `reject_data_issue`, or `reject_model_form_risk`, "
-        "plus a short reviewer note. Do not edit the evidence fields.",
+        (
+            "For each card, return exactly one status: `approved`, "
+            "`hold_for_context`, `reject_data_issue`, or "
+            "`reject_model_form_risk`, plus a short reviewer note. Do not edit "
+            "the evidence fields."
+            if pending
+            else "Human review is complete. Final reviewer identity, timestamp, "
+            "status, and notes are recorded with each card."
+        ),
         "",
     ]
     for card in cards:
@@ -254,6 +325,7 @@ def _render_cards(cards: list[dict[str, Any]]) -> str:
         output = card["coachiq_output"]
         comparison = output["comparison"]
         diagnostics = output["safety_diagnostics"]
+        review = card["editorial_review"]
         modeled = {action["action"]: action for action in output["modeled_actions"]}
         actual_name = str(factual["actual_action"])
         favored_name = str(comparison["model_preferred_supported_action"])
@@ -341,10 +413,12 @@ def _render_cards(cards: list[dict[str, Any]]) -> str:
                 "",
                 "### Human response",
                 "",
-                "- Status: `pending_review`",
+                f"- Status: `{review['status']}`",
+                f"- Reviewer: {review['reviewer'] or '_'}",
+                f"- Reviewed at UTC: `{review['reviewed_at_utc'] or 'pending'}`",
                 "- Allowed final status: `approved` / `hold_for_context` / "
                 "`reject_data_issue` / `reject_model_form_risk`",
-                "- Reviewer notes: _",
+                f"- Reviewer notes: {review['note'] or '_'}",
                 "",
             )
         )
@@ -403,7 +477,8 @@ def _render_readiness(
     lines = [
         "# CoachIQ 2026 Week 1 publication readiness",
         "",
-        "Status: **PUBLICATION PACKAGE NOT READY**",
+        "Status: **PUBLICATION PACKAGE "
+        + ("READY**" if status["publication_package_ready"] else "NOT READY**"),
         "",
         "No public report, social package, visual payload, or publication "
         "manifest has been emitted.",
@@ -429,11 +504,20 @@ def _render_readiness(
         "## Blocking issues",
         "",
     ]
+    number = 1
+    if status["pending_review"]:
+        lines.append(
+            f"{number}. {status['pending_review']} candidate(s) remain "
+            "`pending_review`; automation assigns no approvals."
+        )
+        number += 1
+    if "publication_selection_pending" in status["blockers"]:
+        lines.append(
+            f"{number}. Human review is recorded, but a fresh source-correction "
+            "check and explicit public selection are still required."
+        )
     lines.extend(
         (
-            "1. No human reviewer has supplied final checklist results. "
-            "Automation has left all candidates at `pending_review` and assigned "
-            "no approvals.",
             "",
             "## Quarantine evidence",
             "",
@@ -444,9 +528,9 @@ def _render_readiness(
             "",
             "## Required next step",
             "",
-            "Have a named human reviewer return one allowed final status and notes "
-            "for every card in `human-review.md`. Do not select public cases or "
-            "generate `reports/2026/week-01.md` until those results are supplied.",
+            "Run a fresh source-correction check immediately before package "
+            "generation. Generate public artifacts only if every selected and "
+            "companion game remains correction-safe.",
             "",
             "See `correction-check.json`, `human-review.md`, `review-cards.json`, "
             "and `package-status.json`.",

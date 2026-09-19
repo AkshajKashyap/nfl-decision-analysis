@@ -232,6 +232,7 @@ def validate_human_review(
     review: Mapping[str, Any],
     *,
     correction_check: Mapping[str, Any],
+    require_correction_clearance: bool = True,
 ) -> None:
     """Validate a final human decision and forbid publication-policy overrides."""
 
@@ -259,10 +260,11 @@ def validate_human_review(
             )
         if not all(checks.values()):
             raise ValueError("approval requires every human-review check to pass")
-        validate_correction_check(
-            correction_check,
-            game_ids=(str(record["identity"]["game_id"]),),
-        )
+        if require_correction_clearance:
+            validate_correction_check(
+                correction_check,
+                game_ids=(str(record["identity"]["game_id"]),),
+            )
 
 
 def validate_correction_check(
@@ -301,6 +303,12 @@ def validate_correction_check(
     )
     if scoped_quarantine_is_valid:
         return
+    unsafe_games = scoped_games & quarantined
+    if unsafe_games:
+        raise ValueError(
+            "publication package includes quarantined source game(s): "
+            + ", ".join(sorted(unsafe_games))
+        )
     if not correction_check.get("exact_diff_complete"):
         raise ValueError("source correction exact diff is incomplete")
     if not correction_check.get("ready_for_publication"):
@@ -398,12 +406,11 @@ def build_publication_package(
     selected_decision_ids: Sequence[str],
     correction_check: Mapping[str, Any],
     generated_at_utc: str,
+    include_close_call_companion: bool = True,
 ) -> dict[str, str]:
     """Build public artifacts only from fully approved, correction-safe inputs."""
 
     _validate_utc_timestamp(generated_at_utc, "generated_at_utc")
-    card_game_ids = [str(card["identity"]["game_id"]) for card in review_cards]
-    validate_correction_check(correction_check, game_ids=card_game_ids)
     if not 8 <= len(review_cards) <= 12:
         raise ValueError("a publication package requires an 8-12 case review shortlist")
     if not 3 <= len(selected_decision_ids) <= 5:
@@ -415,18 +422,6 @@ def build_publication_package(
     card_ids = [str(card["decision_id"]) for card in review_cards]
     if len(set(card_ids)) != len(card_ids):
         raise ValueError("review-card decision IDs must be unique")
-    if not correction_check.get("exact_diff_complete"):
-        expected_game_fingerprints = correction_check.get(
-            "unchanged_game_fingerprints", {}
-        )
-        for card in review_cards:
-            game_id = str(card["identity"]["game_id"])
-            if card.get("source_game_fingerprint") != expected_game_fingerprints.get(
-                game_id
-            ):
-                raise ValueError(
-                    f"review-card game fingerprint is not verified: {game_id}"
-                )
     reviews_by_id = {str(review["decision_id"]): review for review in reviews}
     if len(reviews_by_id) != len(reviews) or set(reviews_by_id) != set(card_ids):
         raise ValueError("every shortlisted case requires exactly one final review")
@@ -434,7 +429,10 @@ def build_publication_package(
         if item_id not in records:
             raise ValueError(f"review card not found in weekly audit: {item_id}")
         validate_human_review(
-            records[item_id], reviews_by_id[item_id], correction_check=correction_check
+            records[item_id],
+            reviews_by_id[item_id],
+            correction_check=correction_check,
+            require_correction_clearance=False,
         )
     for item_id in selected_decision_ids:
         if item_id not in card_ids:
@@ -446,9 +444,30 @@ def build_publication_package(
         next(card for card in review_cards if card["decision_id"] == item_id)
         for item_id in selected_decision_ids
     ]
-    close_call = select_close_call_companion(weekly)
+    close_call = (
+        select_close_call_companion(weekly) if include_close_call_companion else None
+    )
+    package_game_ids = {str(card["identity"]["game_id"]) for card in selected_cards}
+    if close_call is not None:
+        package_game_ids.add(str(close_call["identity"]["game_id"]))
+    validate_correction_check(correction_check, game_ids=package_game_ids)
+    if not correction_check.get("exact_diff_complete"):
+        expected_game_fingerprints = correction_check.get(
+            "unchanged_game_fingerprints", {}
+        )
+        for card in selected_cards:
+            game_id = str(card["identity"]["game_id"])
+            if card.get("source_game_fingerprint") != expected_game_fingerprints.get(
+                game_id
+            ):
+                raise ValueError(
+                    f"review-card game fingerprint is not verified: {game_id}"
+                )
     source = _weekly_source(weekly)
-    if source["sha256"] != correction_check.get("current_week_fingerprint"):
+    reviewed_fingerprint = correction_check.get(
+        "reviewed_week_fingerprint", correction_check.get("current_week_fingerprint")
+    )
+    if source["sha256"] != reviewed_fingerprint:
         raise ValueError("correction fingerprint does not match the weekly audit")
 
     report = _render_public_report(selected_cards, close_call, source)
@@ -457,7 +476,10 @@ def build_publication_package(
     public_json_payload = {
         "title": "CoachIQ 2026 Week 1 Report",
         "generated_at_utc": generated_at_utc,
-        "selected_decisions": selected_cards,
+        "selected_decisions": [
+            {**card, "public_wording": _concise_public_language(card)}
+            for card in selected_cards
+        ],
         "close_call_companion": close_call,
         "methodology_note": methodology_note(),
         "visual_data": visual_payload,
@@ -487,6 +509,12 @@ def build_publication_package(
         },
         "source_fingerprint": source["sha256"],
         "source_retrieved_at_utc": source["retrieved_at_utc"],
+        "prepublication_source_fingerprint": correction_check.get(
+            "current_week_fingerprint"
+        ),
+        "close_call_companion_id": (
+            None if close_call is None else close_call["decision_id"]
+        ),
         "report_sha256": _sha256(report),
         "json_sha256": _sha256(public_json),
         "visual_payload_sha256": _sha256(visual_json),
@@ -585,7 +613,7 @@ def _weekly_source(weekly: Mapping[str, Any] | Any) -> Mapping[str, Any]:
 
 def _render_public_report(
     cards: Sequence[Mapping[str, Any]],
-    close_call: Mapping[str, Any],
+    close_call: Mapping[str, Any] | None,
     source: Mapping[str, Any],
 ) -> str:
     lines = [
@@ -593,6 +621,9 @@ def _render_public_report(
         "",
         "A small human-reviewed set of fourth-down decisions from the first "
         "prospective week of the frozen CoachIQ v1 workflow.",
+        "",
+        "Every displayed case passed CoachIQ's frozen publication filters and "
+        "the recorded human-review process.",
         "",
         "## Selected decisions",
         "",
@@ -604,16 +635,21 @@ def _render_public_report(
                 f"### {identity['away_team']} at {identity['home_team']} — "
                 f"play {identity['play_id']}",
                 "",
-                str(card["neutral_public_language"]),
+                _concise_public_language(card),
+                "",
+            )
+        )
+    if close_call is not None:
+        lines.extend(
+            (
+                "## A close-call companion",
+                "",
+                str(close_call["wording"]),
                 "",
             )
         )
     lines.extend(
         (
-            "## A close-call companion",
-            "",
-            str(close_call["wording"]),
-            "",
             "## How to read CoachIQ",
             "",
             methodology_note(),
@@ -631,7 +667,7 @@ def _render_social_drafts(cards: Sequence[Mapping[str, Any]]) -> str:
     lines = ["# Internal social drafts — do not publish automatically", ""]
     for card in cards:
         item_id = card["decision_id"]
-        language = card["neutral_public_language"]
+        language = _concise_public_language(card)
         lines.extend(
             (
                 f"## {item_id}",
@@ -654,6 +690,15 @@ def _render_social_drafts(cards: Sequence[Mapping[str, Any]]) -> str:
             )
         )
     return "\n".join(lines)
+
+
+def _concise_public_language(card: Mapping[str, Any]) -> str:
+    wording = str(card["neutral_public_language"])
+    procedural = (
+        " The comparison met CoachIQ v1's frozen evidence threshold and "
+        "publication-v1 safety checks."
+    )
+    return wording.removesuffix(procedural)
 
 
 def _visual_payload(card: Mapping[str, Any]) -> dict[str, Any]:
